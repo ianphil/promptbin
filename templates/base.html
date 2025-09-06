@@ -129,11 +129,17 @@
             const notification = document.createElement('div');
             notification.className = 'notification notification-' + type;
             notification.textContent = message;
+            
+            let backgroundColor = '#2563eb'; // default blue
+            if (type === 'error') backgroundColor = '#dc2626'; // red
+            if (type === 'info') backgroundColor = '#059669'; // green-ish
+            if (type === 'success') backgroundColor = '#2563eb'; // blue
+            
             notification.style.cssText = 
                 'position: fixed;' +
                 'top: 20px;' +
                 'right: 20px;' +
-                'background: ' + (type === 'error' ? '#dc2626' : '#2563eb') + ';' +
+                'background: ' + backgroundColor + ';' +
                 'color: white;' +
                 'padding: 1rem;' +
                 'border-radius: 0.375rem;' +
@@ -152,6 +158,40 @@
             htmx.ajax('GET', url, {
                 target: '#navigation-container',
                 swap: 'innerHTML'
+            });
+        }
+        
+        // Enhanced share prompt functionality
+        function sharePrompt(promptId) {
+            // Show loading state
+            showNotification('Generating share link...', 'info');
+            
+            fetch('/api/share/' + promptId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}) // Could include expiration options in future
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    // Copy the shareable URL to clipboard
+                    navigator.clipboard.writeText(result.share_url).then(function() {
+                        showNotification('Share link copied to clipboard!', 'success');
+                    }).catch(function(err) {
+                        // Fallback - show the URL in a prompt
+                        console.error('Clipboard API failed:', err);
+                        prompt('Share link generated! Copy this URL:', result.share_url);
+                        showNotification('Share link generated (copied above)', 'success');
+                    });
+                } else {
+                    showNotification('Error: ' + result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Share error:', error);
+                showNotification('Failed to create share link. Please try again.', 'error');
             });
         }
     </script>

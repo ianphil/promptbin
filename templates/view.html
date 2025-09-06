@@ -109,16 +109,7 @@
         });
     }
 
-    // Share prompt functionality
-    function sharePrompt(promptId) {
-        const url = window.location.origin + '/view/' + promptId;
-        navigator.clipboard.writeText(url).then(function() {
-            showNotification('Prompt URL copied to clipboard!');
-        }).catch(function(err) {
-            console.error('Could not copy URL: ', err);
-            showNotification('Failed to copy URL', 'error');
-        });
-    }
+    // sharePrompt function is now defined globally in base.html
 
     // Delete prompt functionality
     function deletePrompt(promptId) {

@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
+import re
 from dotenv import load_dotenv
 from prompt_manager import PromptManager
+from share_manager import ShareManager
 import markdown
 
 load_dotenv()
@@ -9,8 +11,18 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-# Initialize the prompt manager
+# Initialize the prompt manager and share manager
 prompt_manager = PromptManager()
+share_manager = ShareManager()
+
+# Add custom Jinja2 filter for regex operations
+@app.template_filter('regex_findall')
+def regex_findall_filter(text, pattern):
+    """Custom Jinja2 filter to find all regex matches"""
+    try:
+        return re.findall(pattern, text)
+    except (re.error, TypeError):
+        return []
 
 @app.route('/')
 def index():
@@ -215,6 +227,66 @@ def preview_content():
             return jsonify({'status': 'error', 'message': 'Preview generation failed'}), 500
         else:
             return '<div class="preview-error">Preview generation failed</div>', 500
+
+@app.route('/api/share/<prompt_id>', methods=['POST'])
+def create_share_link(prompt_id):
+    """API endpoint to create a shareable link for a prompt"""
+    try:
+        # Verify prompt exists
+        prompt = prompt_manager.get_prompt(prompt_id)
+        if not prompt:
+            return jsonify({'status': 'error', 'message': 'Prompt not found'}), 404
+        
+        # Get optional expiration from request
+        data = request.get_json() or {}
+        expires_in_hours = data.get('expires_in_hours')
+        
+        # Create share token
+        token = share_manager.create_share_token(prompt_id, expires_in_hours)
+        
+        # Generate full shareable URL
+        base_url = request.url_root.rstrip('/')
+        share_url = f"{base_url}/share/{token}/{prompt_id}"
+        
+        return jsonify({
+            'status': 'success',
+            'share_url': share_url,
+            'token': token,
+            'expires_in_hours': expires_in_hours
+        })
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': 'Failed to create share link'}), 500
+
+@app.route('/share/<token>/<prompt_id>')
+def view_shared_prompt(token, prompt_id):
+    """Public view for shared prompts"""
+    try:
+        # Validate share token
+        validated_prompt_id = share_manager.validate_share_token(token)
+        
+        if not validated_prompt_id or validated_prompt_id != prompt_id:
+            return render_template('404.html'), 404
+        
+        # Get the prompt
+        prompt = prompt_manager.get_prompt(prompt_id)
+        if not prompt:
+            return render_template('404.html'), 404
+        
+        # Get share info for analytics
+        share_info = share_manager.get_share_info(token)
+        
+        return render_template('share.html', 
+                             prompt=prompt, 
+                             share_info=share_info,
+                             is_shared_view=True)
+        
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in view_shared_prompt: {e}")
+        import traceback
+        traceback.print_exc()
+        return render_template('500.html'), 500
 
 @app.errorhandler(404)
 def not_found(error):
