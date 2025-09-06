@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - PromptBin{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">🔍</div>
+        <h1>404 - Page Not Found</h1>
+        <p class="error-message">
+            The page or prompt you're looking for doesn't exist or may have been moved.
+        </p>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Browse All Prompts</a>
+            <a href="{{ url_for('create') }}" class="btn btn-secondary">Create New Prompt</a>
+        </div>
+        
+        <div class="error-help">
+            <h3>What you can do:</h3>
+            <ul>
+                <li>Check the URL for typos</li>
+                <li>Use the search bar to find what you're looking for</li>
+                <li>Browse prompts by category in the sidebar</li>
+                <li>Create a new prompt if you can't find what you need</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-focus on search input when 404 page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            setTimeout(function() {
+                searchInput.focus();
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}

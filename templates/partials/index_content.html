@@ -1,8 +1,4 @@
-{% extends "base.html" %}
-
-{% block title %}PromptBin - Browse Prompts{% endblock %}
-
-{% block content %}
+<!-- Index content partial for HTMX -->
 <div class="browse-container">
     <div class="browse-header">
         <h2>Your Prompts</h2>
@@ -25,7 +21,7 @@
     <div class="prompt-grid" id="prompt-grid">
         {% if prompts %}
             {% for prompt in prompts %}
-            {% include 'partials/prompt_card.html' %}
+            {% include 'partials/prompt_card_htmx.html' %}
             {% endfor %}
         {% else %}
             <!-- Empty State -->
@@ -34,23 +30,26 @@
                 <h3>No Prompts Found</h3>
                 {% if selected_category %}
                 <p>No prompts found in the {{ selected_category }} category.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-secondary">View All Prompts</a>
+                <a href="{{ url_for('index') }}" 
+                   class="btn btn-secondary"
+                   hx-get="{{ url_for('htmx_index') }}"
+                   hx-push-url="{{ url_for('index') }}"
+                   hx-target=".main-content"
+                   hx-swap="innerHTML">View All Prompts</a>
                 {% else %}
                 <p>Start by creating your first prompt to organize your AI interactions.</p>
                 {% endif %}
                 <a href="{{ url_for('create') }}" 
                    class="btn btn-primary"
-                   hx-get="{{ url_for('create') }}"
-                   hx-push-url="true"
-                   hx-target="body"
-                   hx-swap="outerHTML">Create Your First Prompt</a>
+                   hx-get="{{ url_for('htmx_create') }}"
+                   hx-push-url="{{ url_for('create') }}"
+                   hx-target=".main-content"
+                   hx-swap="innerHTML">Create Your First Prompt</a>
             </div>
         {% endif %}
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
     // Highlight template variables in prompt previews
     document.addEventListener('DOMContentLoaded', function() {
@@ -71,26 +70,4 @@
             showNotification('Prompt URL copied to clipboard!');
         });
     }
-
-    // Simple notification function
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        notification.style.cssText = 
-            'position: fixed;' +
-            'top: 20px;' +
-            'right: 20px;' +
-            'background: #2563eb;' +
-            'color: white;' +
-            'padding: 1rem;' +
-            'border-radius: 0.375rem;' +
-            'z-index: 1000;';
-        document.body.appendChild(notification);
-        
-        setTimeout(function() {
-            notification.remove();
-        }, 3000);
-    }
 </script>
-{% endblock %}

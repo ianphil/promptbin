@@ -1,0 +1,205 @@
+<!-- Edit content partial for HTMX -->
+<div class="edit-container">
+    <!-- Navigation breadcrumbs -->
+    <nav class="breadcrumbs">
+        <a href="{{ url_for('index') }}"
+           hx-get="{{ url_for('htmx_index') }}"
+           hx-push-url="{{ url_for('index') }}"
+           hx-target=".main-content"
+           hx-swap="innerHTML">All Prompts</a>
+        <span class="separator">›</span>
+        <a href="{{ url_for('view', prompt_id=prompt.id) }}"
+           hx-get="{{ url_for('htmx_view', prompt_id=prompt.id) }}"
+           hx-push-url="{{ url_for('view', prompt_id=prompt.id) }}"
+           hx-target=".main-content"
+           hx-swap="innerHTML">{{ prompt.title }}</a>
+        <span class="separator">›</span>
+        <span class="current">Edit</span>
+    </nav>
+
+    <div class="edit-header">
+        <h2>Edit Prompt</h2>
+        <div class="header-actions">
+            <a href="{{ url_for('view', prompt_id=prompt.id) }}" 
+               class="btn btn-secondary"
+               hx-get="{{ url_for('htmx_view', prompt_id=prompt.id) }}"
+               hx-push-url="{{ url_for('view', prompt_id=prompt.id) }}"
+               hx-target=".main-content"
+               hx-swap="innerHTML">Cancel</a>
+            <button id="preview-toggle" class="btn btn-secondary">Toggle Preview</button>
+            <button type="submit" form="prompt-form" class="btn btn-primary">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="split-pane-container">
+        <!-- Left Pane: Editor -->
+        <div class="editor-pane">
+            <form id="prompt-form" class="prompt-form">
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" name="title" required placeholder="Enter prompt title..." value="{{ prompt.title }}">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category...</option>
+                            <option value="coding" {% if prompt.category == 'coding' %}selected{% endif %}>Coding</option>
+                            <option value="writing" {% if prompt.category == 'writing' %}selected{% endif %}>Writing</option>
+                            <option value="analysis" {% if prompt.category == 'analysis' %}selected{% endif %}>Analysis</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tags">Tags</label>
+                        <input type="text" id="tags" name="tags" placeholder="tag1, tag2, tag3..." value="{{ prompt.tags|join(', ') if prompt.tags else '' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" name="description" placeholder="Brief description of this prompt..." value="{{ prompt.description or '' }}">
+                </div>
+
+                <div class="form-group content-group">
+                    <label for="content">Content *</label>
+                    <textarea 
+                        id="content" 
+                        name="content" 
+                        required 
+                        placeholder="Enter your prompt content here..."
+                        hx-post="{{ url_for('preview_content') }}"
+                        hx-trigger="keyup changed delay:500ms"
+                        hx-target="#preview-content"
+                        hx-swap="innerHTML"
+                    >{{ prompt.content }}</textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Pane: Preview -->
+        <div class="preview-pane" id="preview-pane">
+            <div class="preview-header">
+                <h3>Live Preview</h3>
+                <div class="preview-meta" id="preview-meta">
+                    <span class="word-count">0 words</span>
+                    <span class="template-vars">0 variables</span>
+                </div>
+            </div>
+            <div class="preview-content" id="preview-content">
+                <!-- Initial preview will be loaded by HTMX on page load -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form submission handling
+    document.getElementById('prompt-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = {
+            title: formData.get('title'),
+            category: formData.get('category'),
+            description: formData.get('description'),
+            tags: formData.get('tags'),
+            content: formData.get('content')
+        };
+
+        // Show loading state
+        const saveBtn = document.querySelector('button[type="submit"]');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+
+        fetch('/api/prompts/{{ prompt.id }}', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                showNotification('Prompt updated successfully!');
+                // Navigate to view page using HTMX
+                setTimeout(function() {
+                    htmx.ajax('GET', '/htmx/view/{{ prompt.id }}', {
+                        target: '.main-content',
+                        swap: 'innerHTML'
+                    });
+                    history.pushState({}, '', '/view/{{ prompt.id }}');
+                }, 1000);
+            } else {
+                showNotification('Error: ' + result.message, 'error');
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Failed to update prompt. Please try again.', 'error');
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+        });
+    });
+
+    // Preview toggle functionality
+    document.getElementById('preview-toggle').addEventListener('click', function() {
+        const previewPane = document.getElementById('preview-pane');
+        const container = document.querySelector('.split-pane-container');
+        
+        if (previewPane.style.display === 'none') {
+            previewPane.style.display = 'flex';
+            container.classList.remove('preview-hidden');
+            this.textContent = 'Hide Preview';
+        } else {
+            previewPane.style.display = 'none';
+            container.classList.add('preview-hidden');
+            this.textContent = 'Show Preview';
+        }
+    });
+
+    // Content analysis for preview meta
+    function updatePreviewMeta(content) {
+        const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+        const templateVars = (content.match(/\{\{[^}]+\}\}/g) || []).length;
+        
+        document.querySelector('.word-count').textContent = wordCount + ' word' + (wordCount !== 1 ? 's' : '');
+        document.querySelector('.template-vars').textContent = templateVars + ' variable' + (templateVars !== 1 ? 's' : '');
+    }
+
+    // Listen for content changes
+    document.getElementById('content').addEventListener('input', function() {
+        updatePreviewMeta(this.value);
+    });
+
+    // Initialize preview meta and load initial preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const content = document.getElementById('content').value;
+        updatePreviewMeta(content);
+        
+        // Trigger initial preview load
+        if (content.trim()) {
+            fetch('/api/preview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({content: content})
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    document.getElementById('preview-content').innerHTML = result.html;
+                }
+            })
+            .catch(error => {
+                console.error('Preview error:', error);
+            });
+        }
+    });
+</script>

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Prompt - PromptBin{% endblock %}
+
+{% block content %}
+<div class="create-container">
+    <div class="create-header">
+        <h2>Create New Prompt</h2>
+        <div class="header-actions">
+            <button id="preview-toggle" class="btn btn-secondary">Toggle Preview</button>
+            <button type="submit" form="prompt-form" class="btn btn-primary">Save Prompt</button>
+        </div>
+    </div>
+
+    <div class="split-pane-container">
+        <!-- Left Pane: Editor -->
+        <div class="editor-pane">
+            <form id="prompt-form" class="prompt-form">
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" name="title" required placeholder="Enter prompt title...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category...</option>
+                            <option value="coding">Coding</option>
+                            <option value="writing">Writing</option>
+                            <option value="analysis">Analysis</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tags">Tags</label>
+                        <input type="text" id="tags" name="tags" placeholder="tag1, tag2, tag3...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" name="description" placeholder="Brief description of this prompt...">
+                </div>
+
+                <div class="form-group content-group">
+                    <label for="content">Content *</label>
+                    <textarea 
+                        id="content" 
+                        name="content" 
+                        required 
+                        placeholder="Enter your prompt content here...&#10;&#10;You can use template variables like {{variable_name}} which will be highlighted in the preview."
+                        hx-post="{{ url_for('preview_content') }}"
+                        hx-trigger="keyup changed delay:500ms"
+                        hx-target="#preview-content"
+                        hx-swap="innerHTML"
+                    ></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Pane: Preview -->
+        <div class="preview-pane" id="preview-pane">
+            <div class="preview-header">
+                <h3>Live Preview</h3>
+                <div class="preview-meta" id="preview-meta">
+                    <span class="word-count">0 words</span>
+                    <span class="template-vars">0 variables</span>
+                </div>
+            </div>
+            <div class="preview-content" id="preview-content">
+                <div class="preview-placeholder">
+                    <div class="placeholder-icon">👁️</div>
+                    <p>Start typing to see a live preview...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form submission handling
+    document.getElementById('prompt-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = {
+            title: formData.get('title'),
+            category: formData.get('category'),
+            description: formData.get('description'),
+            tags: formData.get('tags'),
+            content: formData.get('content')
+        };
+
+        // Show loading state
+        const saveBtn = document.querySelector('button[type="submit"]');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+
+        fetch('/api/prompts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                showNotification('Prompt created successfully!');
+                // Redirect to view page after short delay
+                setTimeout(function() {
+                    window.location.href = '/view/' + result.prompt_id;
+                }, 1000);
+            } else {
+                showNotification('Error: ' + result.message, 'error');
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Failed to save prompt. Please try again.', 'error');
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+        });
+    });
+
+    // Preview toggle functionality
+    document.getElementById('preview-toggle').addEventListener('click', function() {
+        const previewPane = document.getElementById('preview-pane');
+        const container = document.querySelector('.split-pane-container');
+        
+        if (previewPane.style.display === 'none') {
+            previewPane.style.display = 'flex';
+            container.classList.remove('preview-hidden');
+            this.textContent = 'Hide Preview';
+        } else {
+            previewPane.style.display = 'none';
+            container.classList.add('preview-hidden');
+            this.textContent = 'Show Preview';
+        }
+    });
+
+    // Content analysis for preview meta
+    function updatePreviewMeta(content) {
+        const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+        const templateVars = (content.match(/\{\{[^}]+\}\}/g) || []).length;
+        
+        document.querySelector('.word-count').textContent = wordCount + ' word' + (wordCount !== 1 ? 's' : '');
+        document.querySelector('.template-vars').textContent = templateVars + ' variable' + (templateVars !== 1 ? 's' : '');
+    }
+
+    // Listen for content changes
+    document.getElementById('content').addEventListener('input', function() {
+        updatePreviewMeta(this.value);
+        
+        // Show preview pane if hidden and user starts typing
+        const previewPane = document.getElementById('preview-pane');
+        if (this.value.length > 0 && previewPane.style.display === 'none') {
+            document.getElementById('preview-toggle').click();
+        }
+    });
+
+    // Simple notification function
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = 'notification notification-' + type;
+        notification.textContent = message;
+        notification.style.cssText = 
+            'position: fixed;' +
+            'top: 20px;' +
+            'right: 20px;' +
+            'background: ' + (type === 'error' ? '#dc2626' : '#2563eb') + ';' +
+            'color: white;' +
+            'padding: 1rem;' +
+            'border-radius: 0.375rem;' +
+            'z-index: 1000;' +
+            'max-width: 300px;';
+        document.body.appendChild(notification);
+        
+        setTimeout(function() {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Initialize preview meta
+    updatePreviewMeta('');
+</script>
+{% endblock %}

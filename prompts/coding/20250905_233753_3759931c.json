@@ -1,0 +1,12 @@
+{
+  "id": "20250905_233753_3759931c",
+  "title": "Git Branch",
+  "content": "Ensure git is an good state. Then create a new branch called {{branch_name}}.",
+  "category": "coding",
+  "description": "Creates a git branch so I can start work on a story.",
+  "tags": [
+    "git"
+  ],
+  "created_at": "2025-09-05T23:37:53.271107",
+  "updated_at": "2025-09-05T23:37:53.271107"
+}

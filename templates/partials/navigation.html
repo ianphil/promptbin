@@ -1,0 +1,75 @@
+<!-- Navigation component with active states -->
+<nav class="sidebar-nav">
+    <a href="{{ url_for('create') }}" 
+       class="btn btn-primary create-btn"
+       hx-get="{{ url_for('htmx_create') }}"
+       hx-push-url="{{ url_for('create') }}"
+       hx-target=".main-content"
+       hx-swap="innerHTML">
+        + New Prompt
+    </a>
+    
+    <h3>Categories</h3>
+    <ul class="category-list">
+        <li>
+            <a href="{{ url_for('index') }}" 
+               class="{{ 'active' if not selected_category else '' }}"
+               hx-get="{{ url_for('htmx_index') }}"
+               hx-push-url="{{ url_for('index') }}"
+               hx-target=".main-content"
+               hx-swap="innerHTML"
+               hx-trigger="click"
+               onclick="updateNavigation('')">
+                All Prompts
+                {% if stats and stats.total_prompts %}
+                <span class="count">({{ stats.total_prompts }})</span>
+                {% endif %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('index') }}?category=coding" 
+               class="{{ 'active' if selected_category == 'coding' else '' }}"
+               hx-get="{{ url_for('htmx_index') }}?category=coding"
+               hx-push-url="{{ url_for('index') }}?category=coding"
+               hx-target=".main-content"
+               hx-swap="innerHTML"
+               hx-trigger="click"
+               onclick="updateNavigation('coding')">
+                Coding
+                {% if stats and stats.by_category.get('coding') %}
+                <span class="count">({{ stats.by_category.get('coding') }})</span>
+                {% endif %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('index') }}?category=writing" 
+               class="{{ 'active' if selected_category == 'writing' else '' }}"
+               hx-get="{{ url_for('htmx_index') }}?category=writing"
+               hx-push-url="{{ url_for('index') }}?category=writing"
+               hx-target=".main-content"
+               hx-swap="innerHTML"
+               hx-trigger="click"
+               onclick="updateNavigation('writing')">
+                Writing
+                {% if stats and stats.by_category.get('writing') %}
+                <span class="count">({{ stats.by_category.get('writing') }})</span>
+                {% endif %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('index') }}?category=analysis" 
+               class="{{ 'active' if selected_category == 'analysis' else '' }}"
+               hx-get="{{ url_for('htmx_index') }}?category=analysis"
+               hx-push-url="{{ url_for('index') }}?category=analysis"
+               hx-target=".main-content"
+               hx-swap="innerHTML"
+               hx-trigger="click"
+               onclick="updateNavigation('analysis')">
+                Analysis
+                {% if stats and stats.by_category.get('analysis') %}
+                <span class="count">({{ stats.by_category.get('analysis') }})</span>
+                {% endif %}
+            </a>
+        </li>
+    </ul>
+</nav>

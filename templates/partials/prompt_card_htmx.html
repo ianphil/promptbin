@@ -1,0 +1,39 @@
+<!-- HTMX-enabled prompt card component -->
+<div class="prompt-card" data-prompt-id="{{ prompt.id }}">
+    <div class="prompt-header">
+        <h3>{{ prompt.title }}</h3>
+        <span class="category-badge {{ prompt.category }}">{{ prompt.category.title() }}</span>
+    </div>
+    <div class="prompt-preview">
+        <p>{{ prompt.description or (prompt.content[:100] + '...' if prompt.content|length > 100 else prompt.content) }}</p>
+    </div>
+    {% if prompt.tags %}
+    <div class="prompt-tags">
+        {% for tag in prompt.tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="prompt-meta">
+        <span class="created-date">Created: {{ prompt.created_at[:10] }}</span>
+        <div class="prompt-actions">
+            <a href="{{ url_for('view', prompt_id=prompt.id) }}" 
+               class="btn-icon" 
+               title="View"
+               hx-get="{{ url_for('htmx_view', prompt_id=prompt.id) }}"
+               hx-push-url="{{ url_for('view', prompt_id=prompt.id) }}"
+               hx-target=".main-content"
+               hx-swap="innerHTML">👁️</a>
+            <a href="{{ url_for('edit', prompt_id=prompt.id) }}" 
+               class="btn-icon" 
+               title="Edit"
+               hx-get="{{ url_for('htmx_edit', prompt_id=prompt.id) }}"
+               hx-push-url="{{ url_for('edit', prompt_id=prompt.id) }}"
+               hx-target=".main-content"
+               hx-swap="innerHTML">✏️</a>
+            <button class="btn-icon" 
+                    title="Share" 
+                    onclick="sharePrompt('{{ prompt.id }}')">🔗</button>
+        </div>
+    </div>
+</div>

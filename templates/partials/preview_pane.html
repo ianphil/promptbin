@@ -1,0 +1,13 @@
+<!-- Live preview pane component -->
+<div class="preview-pane-content">
+    {% if html %}
+    <div class="rendered-content">
+        {{ html|safe }}
+    </div>
+    {% else %}
+    <div class="preview-placeholder">
+        <div class="placeholder-icon">👁️</div>
+        <p>{{ placeholder_text or "Start typing to see a live preview..." }}</p>
+    </div>
+    {% endif %}
+</div>

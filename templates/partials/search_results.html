@@ -1,0 +1,36 @@
+<!-- Search results container -->
+<div class="search-results-container">
+    {% if query %}
+    <div class="search-header">
+        <h3>Search Results for "{{ query }}"</h3>
+        <span class="result-count">{{ count }} result{{ 's' if count != 1 else '' }} found</span>
+    </div>
+    {% endif %}
+    
+    {% if prompts %}
+    <div class="search-results-grid">
+        {% for prompt in prompts %}
+        {% include 'partials/prompt_card_htmx.html' %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="search-no-results">
+        <div class="no-results-icon">🔍</div>
+        <h4>No prompts found</h4>
+        {% if query %}
+        <p>No prompts match your search for "{{ query }}".</p>
+        <div class="search-suggestions">
+            <p>Try:</p>
+            <ul>
+                <li>Different keywords</li>
+                <li>Broader terms</li>
+                <li>Checking for typos</li>
+            </ul>
+        </div>
+        {% else %}
+        <p>Start typing to search through your prompts.</p>
+        {% endif %}
+        <a href="{{ url_for('create') }}" class="btn btn-primary">Create New Prompt</a>
+    </div>
+    {% endif %}
+</div>

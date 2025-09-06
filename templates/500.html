@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - PromptBin{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <h1>500 - Server Error</h1>
+        <p class="error-message">
+            Something went wrong on our end. We're working to fix the issue.
+        </p>
+        
+        <div class="error-actions">
+            <button onclick="window.location.reload()" class="btn btn-primary">Try Again</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Go Home</a>
+        </div>
+        
+        <div class="error-help">
+            <h3>This might help:</h3>
+            <ul>
+                <li>Refresh the page to try again</li>
+                <li>Check if you have a stable internet connection</li>
+                <li>Try again in a few minutes</li>
+                <li>If the problem persists, the issue may be temporary</li>
+            </ul>
+            
+            <details class="error-details">
+                <summary>Technical Details</summary>
+                <p>An internal server error occurred while processing your request. This could be due to:</p>
+                <ul>
+                    <li>File system permissions</li>
+                    <li>Disk space limitations</li>
+                    <li>Data validation errors</li>
+                    <li>Temporary system issues</li>
+                </ul>
+            </details>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-retry functionality after delay
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    function autoRetry() {
+        if (retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(function() {
+                console.log('Auto-retry attempt ' + retryCount);
+                window.location.reload();
+            }, 5000 * retryCount); // Progressive delay: 5s, 10s, 15s
+        }
+    }
+    
+    // Start auto-retry if user hasn't interacted with page
+    let userInteracted = false;
+    document.addEventListener('click', function() { userInteracted = true; });
+    document.addEventListener('keydown', function() { userInteracted = true; });
+    
+    setTimeout(function() {
+        if (!userInteracted) {
+            autoRetry();
+        }
+    }, 3000);
+</script>
+{% endblock %}

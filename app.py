@@ -41,6 +41,42 @@ def edit(prompt_id):
         return render_template('404.html'), 404
     return render_template('edit.html', prompt=prompt)
 
+@app.route('/htmx/view/<prompt_id>')
+def htmx_view(prompt_id):
+    """HTMX endpoint for viewing a prompt - returns only main content"""
+    prompt = prompt_manager.get_prompt(prompt_id)
+    if not prompt:
+        return '<div class="error-container"><div class="error-content"><h1>Prompt not found</h1></div></div>', 404
+    return render_template('partials/view_content.html', prompt=prompt)
+
+@app.route('/htmx/edit/<prompt_id>')
+def htmx_edit(prompt_id):
+    """HTMX endpoint for editing a prompt - returns only main content"""
+    prompt = prompt_manager.get_prompt(prompt_id)
+    if not prompt:
+        return '<div class="error-container"><div class="error-content"><h1>Prompt not found</h1></div></div>', 404
+    return render_template('partials/edit_content.html', prompt=prompt)
+
+@app.route('/htmx/create')
+def htmx_create():
+    """HTMX endpoint for create page - returns only main content"""
+    return render_template('partials/create_content.html')
+
+@app.route('/htmx/index')
+def htmx_index():
+    """HTMX endpoint for index page - returns only main content"""
+    category = request.args.get('category')
+    prompts = prompt_manager.list_prompts(category)
+    stats = prompt_manager.get_stats()
+    return render_template('partials/index_content.html', prompts=prompts, stats=stats, selected_category=category)
+
+@app.route('/htmx/navigation')
+def htmx_navigation():
+    """HTMX endpoint for navigation sidebar"""
+    category = request.args.get('category')
+    stats = prompt_manager.get_stats()
+    return render_template('partials/navigation.html', stats=stats, selected_category=category)
+
 @app.route('/api/prompts', methods=['POST'])
 def create_prompt():
     """API endpoint to create a new prompt"""
@@ -98,7 +134,23 @@ def delete_prompt(prompt_id):
 
 @app.route('/api/search')
 def search_prompts():
-    """API endpoint for searching prompts"""
+    """API endpoint for searching prompts - returns HTML for HTMX"""
+    try:
+        query = request.args.get('q', '')
+        category = request.args.get('category')
+        
+        prompts = prompt_manager.search_prompts(query, category)
+        
+        return render_template('partials/search_results.html', 
+                             prompts=prompts, 
+                             query=query, 
+                             count=len(prompts))
+    except Exception as e:
+        return '<div class="error">Search failed</div>', 500
+
+@app.route('/api/search/json')
+def search_prompts_json():
+    """JSON API endpoint for searching prompts"""
     try:
         query = request.args.get('q', '')
         category = request.args.get('category')
