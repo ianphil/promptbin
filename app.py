@@ -357,7 +357,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
 
     # Reinitialize prompt manager with the parsed data directory
-    global prompt_manager
     prompt_manager = PromptManager(data_dir=args.data_dir)
 
     # Apply mode and start time
