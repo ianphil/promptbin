@@ -1,15 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import re
+import time
+import argparse
+import logging
 from dotenv import load_dotenv
 from prompt_manager import PromptManager
 from share_manager import ShareManager
 import markdown
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:  # pragma: no cover
+    tomllib = None
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['START_TIME'] = time.time()
+app.config['MODE'] = 'standalone'
 
 # Initialize the prompt manager and share manager
 prompt_manager = PromptManager()
@@ -88,6 +97,39 @@ def htmx_navigation():
     category = request.args.get('category')
     stats = prompt_manager.get_stats()
     return render_template('partials/navigation.html', stats=stats, selected_category=category)
+
+@app.route('/health')
+def health():
+    """Health check endpoint for subprocess monitoring"""
+    try:
+        uptime = int(time.time() - app.config.get('START_TIME', time.time()))
+        mode = app.config.get('MODE', 'standalone')
+
+        # Derive version from pyproject if possible
+        version = "0.1.0"
+        try:
+            if tomllib and os.path.exists('pyproject.toml'):
+                with open('pyproject.toml', 'rb') as f:
+                    data = tomllib.load(f)
+                    version = data.get('project', {}).get('version', version)
+        except Exception:
+            pass
+
+        stats = prompt_manager.get_stats()
+        return jsonify({
+            'status': 'healthy',
+            'uptime': uptime,
+            'mode': mode,
+            'version': version,
+            'prompts_count': stats.get('total_prompts', 0)
+        })
+    except Exception:
+        return jsonify({'status': 'unhealthy'}), 500
+
+@app.route('/mcp-status')
+def mcp_status():
+    """Status endpoint indicating MCP integration mode"""
+    return jsonify({'mode': app.config.get('MODE', 'standalone')})
 
 @app.route('/api/prompts', methods=['POST'])
 def create_prompt():
@@ -298,5 +340,27 @@ def internal_error(error):
     """500 error handler"""
     return render_template('500.html'), 500
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Run PromptBin Flask app')
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--port', type=int, default=5000)
+    parser.add_argument('--mode', choices=['standalone', 'mcp-managed'], default='standalone')
+    parser.add_argument('--log-level', default=os.environ.get('PROMPTBIN_LOG_LEVEL', 'INFO'))
+    parser.add_argument('--data-dir', default='prompts')
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    args = parse_args()
+
+    # Configure logging
+    logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
+
+    # Apply mode and start time
+    app.config['MODE'] = args.mode
+    app.config['START_TIME'] = time.time()
+
+    # Debug mode only for standalone
+    debug = args.mode != 'mcp-managed'
+
+    app.run(host=args.host, port=args.port, debug=debug)

@@ -45,13 +45,13 @@ class PromptBinMCPServer:
         self.logger.debug(f"Configuration: {self._safe_config_log()}")
     
     def _load_default_config(self) -> Dict[str, Any]:
-        """Load default configuration with environment variable overrides"""
+        """Hardcoded-first configuration with sensible defaults"""
         return {
-            'mode': os.getenv('PROMPTBIN_MODE', 'mcp-managed'),
-            'flask_port': int(os.getenv('PROMPTBIN_PORT', '5000')),
-            'flask_host': os.getenv('PROMPTBIN_HOST', '127.0.0.1'),
-            'log_level': os.getenv('PROMPTBIN_LOG_LEVEL', 'INFO'),
-            'data_dir': os.getenv('PROMPTBIN_DATA_DIR', str(Path('prompts').absolute())),
+            'mode': 'mcp-managed',
+            'flask_port': 5000,
+            'flask_host': '127.0.0.1',
+            'log_level': 'INFO',
+            'data_dir': str(Path('prompts').absolute()),
             'health_check_interval': 30,
             'shutdown_timeout': 10,
         }
@@ -280,6 +280,17 @@ class PromptBinMCPServer:
                 self.logger.error(f"Error getting prompt by name '{name}': {e}")
                 raise ValueError(f"Failed to get prompt '{name}': {str(e)}")
         
+        @self.mcp.resource("promptbin://flask-status")
+        def flask_status() -> Dict[str, Any]:
+            try:
+                status = {}
+                if hasattr(self, 'flask_manager') and self.flask_manager:
+                    status = self.flask_manager.flask_status()
+                return status
+            except Exception as e:
+                self.logger.error(f"Error getting Flask status: {e}")
+                return {"error": str(e)}
+
         self.logger.info("MCP protocol handlers registered successfully")
     
     async def start(self):
@@ -302,10 +313,17 @@ class PromptBinMCPServer:
             # - search_prompts (tool)
             # - promptbin://get-prompt-by-name/{name} (resource)
             
-            # TODO Phase 3: Start Flask subprocess
-            # - Launch Flask app as subprocess
-            # - Set up health monitoring
-            # - Configure port management
+            # Phase 3: Start Flask subprocess and monitoring
+            from flask_manager import FlaskManager
+            self.flask_manager = FlaskManager(
+                host=self.config['flask_host'],
+                base_port=self.config['flask_port'],
+                log_level=self.config['log_level'],
+                data_dir=self.config['data_dir'],
+                health_check_interval=self.config['health_check_interval'],
+                shutdown_timeout=self.config['shutdown_timeout'],
+            )
+            await self.flask_manager.start_flask()
             
             self.is_running = True
             self.logger.info("MCP Server started successfully")
@@ -327,10 +345,9 @@ class PromptBinMCPServer:
         self.is_running = False
         
         try:
-            # TODO Phase 3: Stop Flask subprocess gracefully
-            # - Send SIGTERM to Flask process
-            # - Wait for clean termination
-            # - Force kill if necessary
+            # Phase 3: Stop Flask subprocess gracefully
+            if hasattr(self, 'flask_manager') and self.flask_manager:
+                await self.flask_manager.stop_flask()
             
             self.logger.info("MCP Server shutdown complete")
             
