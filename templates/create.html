@@ -65,6 +65,7 @@
                 <h3>Live Preview</h3>
                 <div class="preview-meta" id="preview-meta">
                     <span class="word-count">0 words</span>
+                    <span class="token-count">0 tokens</span>
                     <span class="template-vars">0 variables</span>
                 </div>
             </div>
@@ -148,9 +149,11 @@
     // Content analysis for preview meta
     function updatePreviewMeta(content) {
         const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+        const tokenCount = Math.ceil(wordCount * 1.3); // Approximate token count
         const templateVars = (content.match(/\{\{[^}]+\}\}/g) || []).length;
         
         document.querySelector('.word-count').textContent = wordCount + ' word' + (wordCount !== 1 ? 's' : '');
+        document.querySelector('.token-count').textContent = tokenCount + ' token' + (tokenCount !== 1 ? 's' : '');
         document.querySelector('.template-vars').textContent = templateVars + ' variable' + (templateVars !== 1 ? 's' : '');
     }
 

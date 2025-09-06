@@ -167,13 +167,25 @@ def search_prompts_json():
 
 @app.route('/api/preview', methods=['POST'])
 def preview_content():
-    """API endpoint to preview prompt content with syntax highlighting"""
+    """API endpoint to preview prompt content with syntax highlighting - handles both JSON and form data"""
     try:
-        data = request.get_json()
-        if not data or 'content' not in data:
-            return jsonify({'status': 'error', 'message': 'No content provided'}), 400
+        # Handle both JSON (for fetch requests) and form data (for HTMX)
+        if request.is_json:
+            data = request.get_json()
+            if not data or 'content' not in data:
+                return jsonify({'status': 'error', 'message': 'No content provided'}), 400
+            content = data['content']
+            return_json = True
+        else:
+            # Handle form data from HTMX
+            content = request.form.get('content', '')
+            return_json = False
         
-        content = data['content']
+        if not content.strip():
+            if return_json:
+                return jsonify({'status': 'success', 'html': '<div class="preview-placeholder"><div class="placeholder-icon">👁️</div><p>Start typing to see a live preview...</p></div>'})
+            else:
+                return '<div class="preview-placeholder"><div class="placeholder-icon">👁️</div><p>Start typing to see a live preview...</p></div>'
         
         # Convert markdown to HTML
         html_content = markdown.markdown(
@@ -189,12 +201,20 @@ def preview_content():
             html_content
         )
         
-        return jsonify({
-            'status': 'success',
-            'html': html_content
-        })
+        if return_json:
+            return jsonify({
+                'status': 'success',
+                'html': html_content
+            })
+        else:
+            # Return HTML directly for HTMX
+            return html_content
+            
     except Exception as e:
-        return jsonify({'status': 'error', 'message': 'Preview generation failed'}), 500
+        if return_json:
+            return jsonify({'status': 'error', 'message': 'Preview generation failed'}), 500
+        else:
+            return '<div class="preview-error">Preview generation failed</div>', 500
 
 @app.errorhandler(404)
 def not_found(error):

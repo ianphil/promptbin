@@ -239,6 +239,70 @@ code {
     font-weight: 500;
 }
 
+/* Preview content styling */
+.preview-content pre {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.preview-content code {
+    background: #f8f9fa;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.preview-content pre code {
+    background: none;
+    padding: 0;
+}
+
+.preview-content h1,
+.preview-content h2,
+.preview-content h3,
+.preview-content h4,
+.preview-content h5,
+.preview-content h6 {
+    margin: 1rem 0 0.5rem 0;
+    color: #374151;
+}
+
+.preview-content h1 { font-size: 1.875rem; }
+.preview-content h2 { font-size: 1.5rem; }
+.preview-content h3 { font-size: 1.25rem; }
+
+.preview-content p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+}
+
+.preview-content ul,
+.preview-content ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.preview-content blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #6b7280;
+}
+
+.preview-error {
+    color: #dc2626;
+    background: #fef2f2;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid #fecaca;
+}
+
 /* Create/Edit page styles */
 .create-container, .edit-container {
     height: calc(100vh - 120px);
