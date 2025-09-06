@@ -10,18 +10,28 @@ Key features:
 - **Secure sharing**: Share specific prompts via temporary tunnels with automatic security protections
 - **Developer-friendly**: File-based storage, no database setup required
 
-## How to Run (Current State)
+## How to Run
 
 1. Install dependencies:
    ```bash
-   uv install
+   uv sync
    ```
 
-2. Run the Flask web application:
+2. **Standalone mode** - Run just the web interface:
    ```bash
-   python app.py
+   uv run python app.py
    ```
+   Open your browser to `http://localhost:5000`
 
-3. Open your browser to `http://localhost:5000`
+3. **MCP mode** - Run MCP server (auto-launches web interface):
+   ```bash
+   uv run python mcp_server.py
+   ```
+   Provides MCP protocol access for AI tools + web interface
 
-The application currently provides the basic web interface structure with HTMX integration. File-based storage and prompt management features are still in development.
+## Current Status
+
+- ✅ Full web interface with prompt management
+- ✅ MCP server with protocol handlers for AI tool access
+- ⏳ Flask subprocess integration (Phase 3)
+- ⏳ Secure sharing via Dev Tunnels
