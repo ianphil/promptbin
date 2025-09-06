@@ -5,8 +5,8 @@ from prompt_manager import PromptManager
 
 
 def make_pm(tmp_path, monkeypatch) -> PromptManager:
-    monkeypatch.setattr(PromptManager, "PROMPTS_DIR", tmp_path / "prompts", raising=False)
-    return PromptManager()
+    # Use the tmp_path directly as data directory for testing
+    return PromptManager(data_dir=str(tmp_path / "test-prompts"))
 
 
 def test_save_and_get_prompt(tmp_path, monkeypatch):
@@ -31,7 +31,7 @@ def test_save_and_get_prompt(tmp_path, monkeypatch):
     assert saved["created_at"] and saved["updated_at"]
 
     # File exists in expected category path
-    expected_path = tmp_path / "prompts" / "coding" / f"{prompt_id}.json"
+    expected_path = tmp_path / "test-prompts" / "coding" / f"{prompt_id}.json"
     assert expected_path.exists()
     assert json.loads(expected_path.read_text("utf-8"))["id"] == prompt_id
 

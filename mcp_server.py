@@ -27,7 +27,7 @@ class PromptBinMCPServer:
         """Initialize the MCP server with configuration"""
         self.config = config or self._load_default_config()
         self.mcp = FastMCP("PromptBin")
-        self.prompt_manager = PromptManager()
+        self.prompt_manager = PromptManager(data_dir=self.config['data_dir'])
         self.flask_process = None
         self.is_running = False
         
@@ -51,7 +51,7 @@ class PromptBinMCPServer:
             'flask_port': 5000,
             'flask_host': '127.0.0.1',
             'log_level': 'INFO',
-            'data_dir': str(Path('prompts').absolute()),
+            'data_dir': os.path.expanduser('~/promptbin-data'),
             'health_check_interval': 30,
             'shutdown_timeout': 10,
         }

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import socket
 import sys
 from dataclasses import dataclass, field
@@ -27,7 +28,7 @@ class FlaskManager:
     host: str = "127.0.0.1"
     base_port: int = 5000
     log_level: str = "INFO"
-    data_dir: str = "prompts"
+    data_dir: str = os.path.expanduser("~/promptbin-data")
     health_check_interval: int = 30
     shutdown_timeout: int = 10
     restart_threshold: int = 3

@@ -20,9 +20,9 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 app.config['START_TIME'] = time.time()
 app.config['MODE'] = 'standalone'
 
-# Initialize the prompt manager and share manager
-prompt_manager = PromptManager()
+# Initialize managers with defaults (may be updated when app starts)
 share_manager = ShareManager()
+prompt_manager = PromptManager()  # Default initialization
 
 # Add custom Jinja2 filter for regex operations
 @app.template_filter('regex_findall')
@@ -346,7 +346,7 @@ def parse_args():
     parser.add_argument('--port', type=int, default=5000)
     parser.add_argument('--mode', choices=['standalone', 'mcp-managed'], default='standalone')
     parser.add_argument('--log-level', default=os.environ.get('PROMPTBIN_LOG_LEVEL', 'INFO'))
-    parser.add_argument('--data-dir', default='prompts')
+    parser.add_argument('--data-dir', default=os.path.expanduser('~/promptbin-data'))
     return parser.parse_args()
 
 
@@ -355,6 +355,10 @@ if __name__ == '__main__':
 
     # Configure logging
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
+
+    # Reinitialize prompt manager with the parsed data directory
+    global prompt_manager
+    prompt_manager = PromptManager(data_dir=args.data_dir)
 
     # Apply mode and start time
     app.config['MODE'] = args.mode
