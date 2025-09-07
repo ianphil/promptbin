@@ -8,11 +8,11 @@
 # Install from PyPI
 uv add promptbin
 
-# Run MCP server (auto-launches web interface)
-uv run promptbin-mcp
+# Run PromptBin (MCP server + web interface)
+uv run promptbin
 ```
 
-That's it! PromptBin is now running as an MCP server with a web interface at `http://localhost:5000`.
+That's it! PromptBin is now running with both MCP server and web interface at `http://localhost:5001`.
 
 ## Add to AI Tools
 
@@ -23,9 +23,7 @@ Open Settings → Developer → Edit Config and add:
 {
   "mcpServers": {
     "promptbin": {
-      "command": "uv",
-      "args": ["run", "promptbin-mcp"],
-      "workingDirectory": "/path/to/your/project"
+      "command": "promptbin"
     }
   }
 }
@@ -35,8 +33,9 @@ Open Settings → Developer → Edit Config and add:
 - Open Settings → Developer → Model Context Protocol
 - Click "Add Server"
 - Name: `promptbin`
-- Command: `uv`
-- Args: `run promptbin-mcp`
+- Command: `promptbin`
+
+*Note: These configs assume global installation with `pip install promptbin`. For development, use `uv run promptbin`.*
 
 ## Key Features
 - **🚀 Easy setup**: One command to get started
@@ -46,14 +45,21 @@ Open Settings → Developer → Edit Config and add:
 - **📁 Local-first**: Your data stays private, stored locally
 - **⚙️ Production-ready**: Comprehensive logging and error handling
 
-## Alternative Usage
+## Usage Options
 
-### Standalone Web Interface
-Run just the web interface without MCP:
 ```bash
-uv run promptbin
+# Default: Run both MCP server and web interface
+promptbin
+
+# Run only MCP server (for AI tools)
+promptbin --mcp
+
+# Run only web interface (standalone)
+promptbin --web
+
+# Custom port and options
+promptbin --port 8080 --data-dir ~/my-prompts
 ```
-Open your browser to `http://localhost:5001`
 
 ### Development Mode
 For development or customization:
@@ -61,7 +67,7 @@ For development or customization:
 git clone https://github.com/ianphil/promptbin
 cd promptbin
 uv sync
-uv run promptbin-mcp
+uv run promptbin
 ```
 
 ## What You Get

@@ -340,6 +340,11 @@ def main():
     try:
         server = PromptBinMCPServer()
         
+        # Start the Flask subprocess if we have a manager
+        if server.flask_manager:
+            asyncio.run(server.flask_manager.start_flask())
+            server.logger.info(f"Flask web interface started at http://{server.config['flask_host']}:{server.flask_manager.port}")
+        
         # Start the MCP server directly using FastMCP's synchronous run method
         server.mcp.run()
     except KeyboardInterrupt:

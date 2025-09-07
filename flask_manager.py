@@ -88,8 +88,8 @@ class FlaskManager:
                 stderr=asyncio.subprocess.DEVNULL
             )
 
-        # Give Flask a moment to start up before health checking
-        await asyncio.sleep(2)
+        # Give Flask more time to start up before health checking
+        await asyncio.sleep(5)
         
         # Wait for health
         ready = await self._wait_until_healthy(timeout=30)

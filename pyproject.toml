@@ -1,6 +1,6 @@
 [project]
 name = "promptbin"
-version = "0.1.0"
+version = "0.3.0"
 description = "Easy-to-use MCP server for prompt management with web interface and secure sharing"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -41,8 +41,7 @@ Issues = "https://github.com/ianphil/promptbin/issues"
 Documentation = "https://github.com/ianphil/promptbin#readme"
 
 [project.scripts]
-promptbin = "app:main"
-promptbin-mcp = "mcp_server:main"
+promptbin = "cli:main"
 promptbin-setup = "setup_checker:main"
 promptbin-install-tunnel = "scripts.install_devtunnel:main"
 
