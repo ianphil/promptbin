@@ -4,29 +4,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PromptBin is a local-first prompt management and sharing tool with dual-mode operation:
-- **MCP-Managed Mode**: MCP server (`mcp_server.py`) auto-launches Flask web interface
-- **Standalone Mode**: Independent Flask app via `python app.py`
+PromptBin is the easiest way to run a Model Context Protocol (MCP) server with full prompt management capabilities. It's designed as a reference implementation and example for MCP server integration.
+
+**Primary use case**: `uv add promptbin && uv run promptbin-mcp`
+
+**Modes**:
+- **MCP Server Mode** (primary): Full MCP protocol + auto-launching web interface
+- **Standalone Mode** (secondary): Web interface only
 
 ## Development Commands
 
-Project is fully implemented with comprehensive prompt management and Dev Tunnels integration:
-
+**For PyPI distribution (recommended)**:
 ```bash
-# Project is managed with uv package manager
-uv sync
+# Install from PyPI
+uv add promptbin
+
+# Run MCP server (primary use case)
+uv run promptbin-mcp
 
 # Run standalone web interface
-uv run python app.py
-
-# Run MCP server (auto-launches web interface)
-uv run python mcp_server.py
+uv run promptbin
 
 # Setup verification
 uv run promptbin-setup
 
 # Install Dev Tunnels CLI
 uv run promptbin-install-tunnel
+```
+
+**For development**:
+```bash
+# Clone and develop
+git clone https://github.com/ianphil/promptbin
+cd promptbin
+uv sync
+uv run promptbin-mcp
 ```
 
 ## Architecture Overview

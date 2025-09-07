@@ -1,0 +1,44 @@
+# Include documentation files
+include README.md
+include LICENSE
+include TUNNELS.md
+include CLAUDE.md
+include AGENTS.md
+
+# Include package data
+include pyproject.toml
+include setup.py
+
+# Include templates and static files
+recursive-include templates *
+recursive-include static *
+
+# Include scripts
+recursive-include scripts *
+
+# Include AI docs for reference
+recursive-include ai_docs *
+
+# Exclude development and cache files
+exclude .gitignore
+exclude uv.lock
+exclude .env*
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * .DS_Store
+recursive-exclude * .pytest_cache
+recursive-exclude * .coverage
+recursive-exclude * *.log
+
+# Exclude git and IDE files
+recursive-exclude * .git*
+recursive-exclude * .vscode
+recursive-exclude * .idea
+recursive-exclude * *.swp
+recursive-exclude * *.swo
+recursive-exclude * *~
+
+# Exclude test data and temporary files
+recursive-exclude * test_*
+recursive-exclude * temp_*
+recursive-exclude * tmp_*

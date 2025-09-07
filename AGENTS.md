@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+PromptBin is an **MCP server example** designed for easy distribution and usage via PyPI.
+
+**Primary workflow**: `uv add promptbin && uv run promptbin-mcp`
+
 ## Project Structure & Module Organization
 - **app.py**: Complete Flask web app with all routes, views, and lifecycle management.
 - **mcp_server.py**: Full MCP server implementation with subprocess integration.
@@ -14,13 +18,19 @@
 - **ai_docs/**: Internal planning and development prompts (completed phases).
 
 ## Build, Test, and Development Commands
-- **Install deps**: `uv sync` (requires Python 3.11+ and uv).
-- **Run web UI**: `uv run python app.py` (http://localhost:5000).
-- **Run MCP server**: `uv run python mcp_server.py` (MCP + web lifecycle).
+
+**Production usage** (PyPI):
+- **Install**: `uv add promptbin` (requires Python 3.11+ and uv).
+- **Run MCP server**: `uv run promptbin-mcp` (primary use case).
+- **Run web UI**: `uv run promptbin` (standalone mode).
 - **Setup verification**: `uv run promptbin-setup` (validates system readiness).
 - **Install Dev Tunnels**: `uv run promptbin-install-tunnel` (cross-platform installer).
+
+**Development** (local):
+- **Install deps**: `uv sync`.
+- **Run MCP server**: `uv run promptbin-mcp`.
+- **Run web UI**: `uv run promptbin`.
 - **Lint/format**: None enforced; see style section below.
-- **Entry points**: Available via `uv run promptbin`, `uv run promptbin-setup`, `uv run promptbin-install-tunnel`.
 
 ## Coding Style & Naming Conventions
 - Python style: PEP 8, 4‑space indents, descriptive names.
