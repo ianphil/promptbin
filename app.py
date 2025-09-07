@@ -115,8 +115,9 @@ def health():
         # Derive version from pyproject if possible
         version = "0.1.0"
         try:
-            if tomllib and os.path.exists('pyproject.toml'):
-                with open('pyproject.toml', 'rb') as f:
+            pyproject_path = os.path.join(os.path.dirname(__file__), 'pyproject.toml')
+            if tomllib and os.path.exists(pyproject_path):
+                with open(pyproject_path, 'rb') as f:
                     data = tomllib.load(f)
                     version = data.get('project', {}).get('version', version)
         except Exception:
@@ -125,7 +126,8 @@ def health():
         try:
             stats = prompt_manager.get_stats()
             prompts_count = stats.get('total_prompts', 0) if stats else 0
-        except Exception:
+        except Exception as e:
+            logging.warning(f"Error calculating prompt stats: {e}")
             prompts_count = 0
             
         return jsonify({

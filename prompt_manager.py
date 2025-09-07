@@ -16,6 +16,7 @@ class PromptManager:
     """File-based storage manager for prompts"""
     
     VALID_CATEGORIES = ['coding', 'writing', 'analysis']
+    WILDCARD_PATTERNS = ['*', '**']
     
     def __init__(self, data_dir: Optional[str] = None):
         """Initialize the PromptManager and ensure directories exist"""
@@ -196,7 +197,10 @@ class PromptManager:
                     try:
                         with open(json_file, 'r', encoding='utf-8') as f:
                             prompt_data = json.load(f)
-                            prompts.append(prompt_data)
+                            if prompt_data is not None:
+                                prompts.append(prompt_data)
+                            else:
+                                logger.warning(f"Skipping invalid prompt data (None) in {json_file}")
                     except Exception as e:
                         logger.error(f"Error reading prompt file {json_file}: {e}")
                         continue
@@ -254,7 +258,7 @@ class PromptManager:
             query_lower = query.lower().strip()
             
             # Handle wildcard searches
-            if query_lower == '*' or query_lower == '**':
+            if query_lower in self.WILDCARD_PATTERNS:
                 return all_prompts
             
             for prompt in all_prompts:
@@ -292,6 +296,7 @@ class PromptManager:
                 
                 for prompt in prompts:
                     if prompt is None:
+                        logger.warning(f"Found None prompt in category {category} - possible data integrity issue")
                         continue
                     # Collect unique tags
                     stats['total_tags'].update(prompt.get('tags', []))

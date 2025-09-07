@@ -20,7 +20,9 @@ def find_available_port(start_port: int = 5000, max_tries: int = 50) -> int:
                 return port
             except OSError:
                 port += 1
-    return start_port
+    
+    # Raise exception instead of returning potentially occupied port
+    raise RuntimeError(f"No available ports found in range {start_port}-{start_port + max_tries - 1}")
 
 
 @dataclass
@@ -32,6 +34,7 @@ class FlaskManager:
     health_check_interval: int = 30
     shutdown_timeout: int = 10
     restart_threshold: int = 3
+    debug_mode: bool = False
 
     process: Optional[asyncio.subprocess.Process] = field(default=None, init=False)
     port: Optional[int] = field(default=None, init=False)
@@ -65,11 +68,25 @@ class FlaskManager:
         ]
 
         self._logger.info(f"Starting Flask on {self.host}:{self.port} ...")
-        self.process = await asyncio.create_subprocess_exec(
-            *cmd, 
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL
-        )
+        
+        if self.debug_mode:
+            # In debug mode, capture output to log files
+            log_dir = os.path.join(self.data_dir, 'logs')
+            os.makedirs(log_dir, exist_ok=True)
+            stdout_file = open(os.path.join(log_dir, 'flask_stdout.log'), 'w')
+            stderr_file = open(os.path.join(log_dir, 'flask_stderr.log'), 'w')
+            
+            self.process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=stdout_file,
+                stderr=stderr_file
+            )
+        else:
+            self.process = await asyncio.create_subprocess_exec(
+                *cmd, 
+                stdout=asyncio.subprocess.DEVNULL,
+                stderr=asyncio.subprocess.DEVNULL
+            )
 
         # Give Flask a moment to start up before health checking
         await asyncio.sleep(2)
