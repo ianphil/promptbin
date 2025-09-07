@@ -10,17 +10,23 @@ PromptBin is a local-first prompt management and sharing tool with dual-mode ope
 
 ## Development Commands
 
-Currently a minimal project with placeholder implementation. Development will require:
+Project is fully implemented with comprehensive prompt management and Dev Tunnels integration:
 
 ```bash
 # Project is managed with uv package manager
-uv install
+uv sync
 
-# Run standalone web interface (when implemented)
-python app.py
+# Run standalone web interface
+uv run python app.py
 
-# Current main entry point
-python main.py
+# Run MCP server (auto-launches web interface)
+uv run python mcp_server.py
+
+# Setup verification
+uv run promptbin-setup
+
+# Install Dev Tunnels CLI
+uv run promptbin-install-tunnel
 ```
 
 ## Architecture Overview
@@ -53,11 +59,11 @@ python main.py
 - Sharing: Microsoft Dev Tunnels for external access
 - MCP: Separate server component for AI tool integration
 
-### Development Phases (per ai_docs/prompts.md)
-1. **Core Local Functionality**: File storage, Flask app, HTMX templates
-2. **MCP Integration**: Auto-lifecycle, prompt access protocol
-3. **Sharing & Security**: Dev Tunnels, share tokens, rate limiting
-4. **Polish & Enhancement**: Advanced highlighting, analytics
+### Development Phases (Completed)
+1. ✅ **Core Local Functionality**: File storage, Flask app, HTMX templates
+2. ✅ **MCP Integration**: Auto-lifecycle, prompt access protocol
+3. ✅ **Sharing & Security**: Dev Tunnels, share tokens, rate limiting
+4. 🔄 **Polish & Enhancement**: Advanced highlighting, analytics (in progress)
 
 ### Security Architecture
 - Private by default (localhost:5000)
@@ -74,6 +80,39 @@ python main.py
 
 ## Implementation Notes
 
-This project is in very early stages - currently only has a basic `main.py` placeholder. The comprehensive PRD and development prompts in `ai_docs/` define the full vision. Implementation should follow the 16-prompt sequence in `ai_docs/prompts.md` for systematic development.
+Project is fully implemented with comprehensive features:
 
-Key architectural decisions are already documented - focus on implementing the planned dual-mode operation and file-based storage system as the foundation.
+### Current Implementation Status
+- ✅ **Dual-mode operation**: Both standalone and MCP-managed modes working
+- ✅ **File-based storage**: JSON prompts organized by category
+- ✅ **HTMX interface**: Dynamic UI without full page reloads
+- ✅ **Dev Tunnels integration**: Secure public sharing with rate limiting
+- ✅ **MCP server**: Full protocol implementation with AI tool access
+- ✅ **Documentation & Setup**: Comprehensive guides and automation scripts
+
+### Key Components
+- `app.py`: Complete Flask web application with all routes and features
+- `mcp_server.py`: Full MCP server implementation with subprocess management
+- `prompt_manager.py`: File-based storage with search, categories, and metadata
+- `share_manager.py`: Secure sharing with ephemeral tokens
+- `tunnel_manager.py`: Microsoft Dev Tunnels integration with rate limiting
+- `setup_checker.py`: System validation and diagnostic tool
+- `scripts/install_devtunnel.py`: Cross-platform installer automation
+- `TUNNELS.md`: Comprehensive technical documentation
+
+### Environment Configuration
+Supports extensive configuration via environment variables:
+```bash
+# Tunnel control
+DEVTUNNEL_ENABLED=true
+DEVTUNNEL_AUTO_START=false
+DEVTUNNEL_RATE_LIMIT=5
+DEVTUNNEL_RATE_WINDOW=30
+DEVTUNNEL_LOG_LEVEL=info
+
+# MCP server
+PROMPTBIN_PORT=5000
+PROMPTBIN_HOST=127.0.0.1
+PROMPTBIN_DATA_DIR=~/promptbin-data
+PROMPTBIN_LOG_LEVEL=INFO
+```

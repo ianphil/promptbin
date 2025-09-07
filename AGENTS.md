@@ -1,18 +1,26 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- app.py: Flask web app (routes, views).
-- mcp_server.py: MCP server integrating PromptBin tools.
-- prompt_manager.py / share_manager.py: File storage, sharing logic.
-- templates/ and static/: UI templates and assets.
-- prompts/: Local JSON prompt data, grouped by category (coding, writing, analysis).
-- ai_docs/: Internal planning and prompts for future phases.
+- **app.py**: Complete Flask web app with all routes, views, and lifecycle management.
+- **mcp_server.py**: Full MCP server implementation with subprocess integration.
+- **prompt_manager.py**: File-based storage with search, categories, and metadata.
+- **share_manager.py**: Secure sharing logic with ephemeral tokens.
+- **tunnel_manager.py**: Microsoft Dev Tunnels integration with rate limiting and security.
+- **setup_checker.py**: System validation and diagnostic tool.
+- **scripts/install_devtunnel.py**: Cross-platform installer automation.
+- **templates/** and **static/**: HTMX-powered UI templates and assets.
+- **prompts/**: Local JSON prompt data, organized by category (coding, writing, analysis).
+- **TUNNELS.md**: Comprehensive technical documentation for Dev Tunnels.
+- **ai_docs/**: Internal planning and development prompts (completed phases).
 
 ## Build, Test, and Development Commands
-- Install deps: `uv sync` (requires Python 3.11+ and uv).
-- Run web UI: `uv run python app.py` (http://localhost:5000).
-- Run MCP server: `uv run python mcp_server.py` (MCP + web lifecycle).
-- Lint/format: none enforced; see style section below.
+- **Install deps**: `uv sync` (requires Python 3.11+ and uv).
+- **Run web UI**: `uv run python app.py` (http://localhost:5000).
+- **Run MCP server**: `uv run python mcp_server.py` (MCP + web lifecycle).
+- **Setup verification**: `uv run promptbin-setup` (validates system readiness).
+- **Install Dev Tunnels**: `uv run promptbin-install-tunnel` (cross-platform installer).
+- **Lint/format**: None enforced; see style section below.
+- **Entry points**: Available via `uv run promptbin`, `uv run promptbin-setup`, `uv run promptbin-install-tunnel`.
 
 ## Coding Style & Naming Conventions
 - Python style: PEP 8, 4‑space indents, descriptive names.
@@ -22,10 +30,12 @@
 - Categories: use one of `coding`, `writing`, `analysis`.
 
 ## Testing Guidelines
-- Current status: no formal test suite yet.
-- If adding tests, use `pytest`; place tests in `tests/` and name files `test_*.py`.
-- Prioritize unit tests for PromptManager (save/get/list/search/delete) and share token validation.
-- Aim for clear, isolated tests over broad integration first.
+- **Current status**: No formal test suite yet, but comprehensive manual validation via setup_checker.py.
+- **If adding tests**: Use `pytest`; place tests in `tests/` and name files `test_*.py`.
+- **Priority areas**: PromptManager (save/get/list/search/delete), share token validation, tunnel rate limiting.
+- **Testing tools**: `setup_checker.py` validates system configuration and readiness.
+- **Manual validation**: Run `uv run promptbin-setup` to check all components.
+- **Aim for**: Clear, isolated tests over broad integration first.
 
 ## Commit & Pull Request Guidelines
 - Commits: prefer Conventional Commits (e.g., `feat:`, `fix:`, `chore:`). Keep messages imperative and scoped.
@@ -33,6 +43,10 @@
 - Keep PRs small and cohesive; note any follow‑ups explicitly.
 
 ## Security & Configuration Tips
-- Environment: create a `.env` with `SECRET_KEY` for Flask; the app loads it via python‑dotenv.
-- MCP config via env: `PROMPTBIN_PORT`, `PROMPTBIN_HOST`, `PROMPTBIN_LOG_LEVEL`, `PROMPTBIN_DATA_DIR`.
-- Data safety: prompts are local files; review `.gitignore` to avoid committing sensitive data.
+- **Environment**: Create a `.env` with `SECRET_KEY` for Flask; the app loads it via python‑dotenv.
+- **MCP config**: `PROMPTBIN_PORT`, `PROMPTBIN_HOST`, `PROMPTBIN_LOG_LEVEL`, `PROMPTBIN_DATA_DIR`.
+- **Dev Tunnels config**: `DEVTUNNEL_ENABLED`, `DEVTUNNEL_AUTO_START`, `DEVTUNNEL_RATE_LIMIT`, `DEVTUNNEL_RATE_WINDOW`, `DEVTUNNEL_LOG_LEVEL`.
+- **Data safety**: Prompts are local files; review `.gitignore` to avoid committing sensitive data.
+- **Rate limiting**: Built-in protection (5 attempts per IP per 30 minutes) with automatic tunnel shutdown.
+- **Share tokens**: Cryptographically secure, ephemeral (reset on app restart).
+- **Tunnel security**: Anonymous access only for explicitly shared prompts; private data remains local.
