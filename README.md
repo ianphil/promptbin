@@ -35,3 +35,34 @@ Key features:
 - ✅ MCP server with protocol handlers for AI tool access
 - ⏳ Flask subprocess integration (Phase 3)
 - ⏳ Secure sharing via Dev Tunnels
+
+## Add MCP Server to ChatGPT & Claude (Desktop)
+
+Prereq: install deps first (`uv sync`). The apps will launch the MCP server themselves.
+
+ChatGPT Desktop (Mac/Windows):
+- Open Settings → Developer → Model Context Protocol.
+- Click “Add Server”.
+- Name: PromptBin
+- Command: `uv`
+- Args: `run python mcp_server.py`
+- Working directory: path to this repo.
+
+Claude Desktop (Mac/Windows):
+- Open Settings → Developer → Edit Config
+
+```json
+"PromptBin": {
+            "command": "/Users/ianphil/.local/bin/uv",
+            "args": [
+                "run",
+                "/Users/ianphil/src/promptbin/.venv/bin/python",
+                "/Users/ianphil/src/promptbin/mcp_server.py"
+            ],
+            "workingDirectory": "/Users/ianphil/src/promptbin"
+        }
+```
+
+Notes:
+- After adding, you can list/search prompts via the PromptBin MCP tools. The MCP server also starts the local web UI on `http://127.0.0.1:<port>`.
+- If `uv` is not on PATH, replace `uv` with the full path or use your Python venv: `python mcp_server.py`.

@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -15,22 +16,32 @@ class PromptManager:
     """File-based storage manager for prompts"""
     
     VALID_CATEGORIES = ['coding', 'writing', 'analysis']
-    PROMPTS_DIR = Path('prompts')
+    WILDCARD_PATTERNS = ['*', '**']
     
-    def __init__(self):
+    def __init__(self, data_dir: Optional[str] = None):
         """Initialize the PromptManager and ensure directories exist"""
+        self.PROMPTS_DIR = Path(data_dir) if data_dir else Path(os.path.expanduser('~/promptbin-data'))
         self._ensure_directories()
     
     def _ensure_directories(self):
         """Ensure all required directories exist"""
         try:
+            # First ensure the main data directory exists
+            self.PROMPTS_DIR.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Ensured main data directory exists: {self.PROMPTS_DIR}")
+            
             for category in self.VALID_CATEGORIES:
                 category_dir = self.PROMPTS_DIR / category
                 category_dir.mkdir(parents=True, exist_ok=True)
                 logger.info(f"Ensured directory exists: {category_dir}")
+        except PermissionError as e:
+            error_msg = f"Permission denied creating directories at {self.PROMPTS_DIR}: {e}"
+            logger.error(error_msg)
+            logger.error("This may be due to a read-only file system. Consider using a writable directory like ~/promptbin-data")
+            sys.exit(1)
         except Exception as e:
-            logger.error(f"Error creating directories: {e}")
-            raise
+            logger.error(f"Error creating directories at {self.PROMPTS_DIR}: {e}")
+            sys.exit(1)
     
     def _generate_unique_id(self) -> str:
         """Generate a unique ID for a new prompt"""
@@ -186,7 +197,10 @@ class PromptManager:
                     try:
                         with open(json_file, 'r', encoding='utf-8') as f:
                             prompt_data = json.load(f)
-                            prompts.append(prompt_data)
+                            if prompt_data is not None:
+                                prompts.append(prompt_data)
+                            else:
+                                logger.warning(f"Skipping invalid prompt data (None) in {json_file}")
                     except Exception as e:
                         logger.error(f"Error reading prompt file {json_file}: {e}")
                         continue
@@ -228,7 +242,7 @@ class PromptManager:
         Search prompts by query string
         
         Args:
-            query: Search query string
+            query: Search query string (supports * wildcard)
             category: Optional category to search within
             
         Returns:
@@ -241,7 +255,11 @@ class PromptManager:
             all_prompts = self.list_prompts(category)
             matching_prompts = []
             
-            query_lower = query.lower()
+            query_lower = query.lower().strip()
+            
+            # Handle wildcard searches
+            if query_lower in self.WILDCARD_PATTERNS:
+                return all_prompts
             
             for prompt in all_prompts:
                 # Search in title, content, description, and tags
@@ -277,19 +295,24 @@ class PromptManager:
                 stats['total_prompts'] += len(prompts)
                 
                 for prompt in prompts:
+                    if prompt is None:
+                        logger.warning(f"Found None prompt in category {category} - possible data integrity issue")
+                        continue
                     # Collect unique tags
                     stats['total_tags'].update(prompt.get('tags', []))
                     
-                    # Track recent activity (last 10)
-                    stats['recent_activity'].append({
-                        'id': prompt['id'],
-                        'title': prompt['title'],
-                        'category': prompt['category'],
-                        'updated_at': prompt['updated_at']
-                    })
+                    # Track recent activity (last 10) - safely get required fields
+                    if all(key in prompt for key in ['id', 'title', 'category', 'updated_at']):
+                        stats['recent_activity'].append({
+                            'id': prompt['id'],
+                            'title': prompt['title'],
+                            'category': prompt['category'],
+                            'updated_at': prompt['updated_at']
+                        })
             
             # Sort recent activity and limit to 10
-            stats['recent_activity'].sort(
+            stats['recent_activity'] = sorted(
+                stats['recent_activity'],
                 key=lambda x: x['updated_at'], 
                 reverse=True
             )[:10]

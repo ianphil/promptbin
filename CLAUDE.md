@@ -28,12 +28,12 @@ python main.py
 ### Core Components
 - **Flask Web App** (`app.py`): HTMX-powered interface on localhost:5000
 - **MCP Server** (`mcp_server.py`): Model Context Protocol integration with auto-lifecycle management
-- **File-Based Storage**: JSON files in `prompts/{category}/{prompt_id}.json`
+- **File-Based Storage**: JSON files in `~/promptbin-data/{category}/{prompt_id}.json`
 - **Microsoft Dev Tunnels**: Secure sharing with automatic security protections
 
 ### Data Organization
 ```
-prompts/
+~/promptbin-data/
 ├── coding/     # Development-related prompts
 ├── writing/    # Content creation prompts  
 └── analysis/   # Data analysis prompts

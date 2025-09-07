@@ -1,0 +1,661 @@
+2025-09-06T19:58:33.047Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T19:58:33.050Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T19:58:33.058Z [PromptBin] [info] Using MCP server command: uv with args and path: {
+  metadata: {
+    args: [ 'run', 'python', 'mcp_server.py', [length]: 3 ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T19:58:33.061Z [PromptBin] [info] Using MCP server command: uv with args and path: {
+  metadata: {
+    args: [ 'run', 'python', 'mcp_server.py', [length]: 3 ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T19:58:33.059Z [PromptBin] [error] spawn uv ENOENT {
+  metadata: {
+    context: 'connection',
+    stack: 'Error: spawn uv ENOENT\n' +
+      '    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n' +
+      '    at onErrorNT (node:internal/child_process:483:16)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)'
+  }
+}
+2025-09-06T19:58:33.059Z [PromptBin] [error] spawn uv ENOENT {
+  metadata: {
+    stack: 'Error: spawn uv ENOENT\n' +
+      '    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n' +
+      '    at onErrorNT (node:internal/child_process:483:16)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)'
+  }
+}
+2025-09-06T19:58:33.062Z [PromptBin] [error] spawn uv ENOENT {
+  metadata: {
+    context: 'connection',
+    stack: 'Error: spawn uv ENOENT\n' +
+      '    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n' +
+      '    at onErrorNT (node:internal/child_process:483:16)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)'
+  }
+}
+2025-09-06T19:58:33.062Z [PromptBin] [error] spawn uv ENOENT {
+  metadata: {
+    stack: 'Error: spawn uv ENOENT\n' +
+      '    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n' +
+      '    at onErrorNT (node:internal/child_process:483:16)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)'
+  }
+}
+2025-09-06T19:58:33.064Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T19:58:33.064Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T19:58:33.064Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T19:58:33.064Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T19:58:33.063Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T19:58:33.063Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T19:58:33.063Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T19:58:33.063Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:00:58.085Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:00:58.090Z [PromptBin] [info] Using MCP server command: uv with args and path: {
+  metadata: {
+    args: [ 'run', 'python', 'mcp_server.py', [length]: 3 ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:00:58.091Z [PromptBin] [error] spawn uv ENOENT {
+  metadata: {
+    context: 'connection',
+    stack: 'Error: spawn uv ENOENT\n' +
+      '    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n' +
+      '    at onErrorNT (node:internal/child_process:483:16)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)'
+  }
+}
+2025-09-06T20:00:58.091Z [PromptBin] [error] spawn uv ENOENT {
+  metadata: {
+    stack: 'Error: spawn uv ENOENT\n' +
+      '    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n' +
+      '    at onErrorNT (node:internal/child_process:483:16)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)'
+  }
+}
+2025-09-06T20:00:58.092Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:00:58.092Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:00:58.092Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:00:58.092Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:01:04.643Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:01:04.647Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:01:04.659Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [ 'run', 'python', 'mcp_server.py', [length]: 3 ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:01:04.660Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [ 'run', 'python', 'mcp_server.py', [length]: 3 ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:01:04.659Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:01:04.660Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:01:04.674Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+2025-09-06T20:01:04.677Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+/Users/ianphil/.local/share/uv/python/cpython-3.13.3-macos-aarch64-none/bin/python3.13: can't open file '//mcp_server.py': [Errno 2] No such file or directory
+/Users/ianphil/.local/share/uv/python/cpython-3.13.3-macos-aarch64-none/bin/python3.13: can't open file '//mcp_server.py': [Errno 2] No such file or directory
+2025-09-06T20:01:04.859Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:01:04.860Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:01:04.860Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:30.746Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:30.746Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:02:30.821Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:02:30.828Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [ 'run', 'python', 'mcp_server.py', [length]: 3 ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:02:30.828Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:02:30.829Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+/Users/ianphil/.local/share/uv/python/cpython-3.13.3-macos-aarch64-none/bin/python3.13: can't open file '//mcp_server.py': [Errno 2] No such file or directory
+2025-09-06T20:02:30.849Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:02:30.849Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:30.849Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:02:30.849Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:02:30.849Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:36.092Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:02:36.095Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:02:36.103Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      'python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:02:36.104Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      'python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:02:36.103Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:02:36.104Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:02:36.126Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+2025-09-06T20:02:36.126Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+ModuleNotFoundError: No module named 'mcp'
+2025-09-06T20:02:36.186Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:02:36.187Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:02:36.187Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:04:53.021Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:04:53.020Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:04:53.131Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:04:57.183Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:04:57.186Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:04:57.193Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      'python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:04:57.194Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      'python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:04:57.193Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:04:57.194Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:04:57.208Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+2025-09-06T20:04:57.211Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+ModuleNotFoundError: No module named 'mcp'
+2025-09-06T20:04:57.243Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:04:57.243Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:04:57.243Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:04:57.243Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:04:57.244Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:04:57.244Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:04:57.244Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:04:57.244Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:04:57.244Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:04:57.244Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:09.006Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:09.006Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:07:09.117Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:07:14.069Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:07:14.072Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:07:14.080Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 2
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:07:14.081Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 2
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:07:14.080Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:07:14.081Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:07:14.103Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+2025-09-06T20:07:14.104Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+2025-09-06T20:07:14.131Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:07:14.132Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:07:14.131Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:14.131Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:07:14.131Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:07:14.132Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:14.132Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:14.132Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:07:14.132Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:07:14.132Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:36.976Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:36.976Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:07:37.087Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:07:43.232Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:07:43.235Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:07:43.242Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 2
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:07:43.243Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 2
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:07:43.243Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:07:43.244Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:07:43.257Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+2025-09-06T20:07:43.258Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+2025-09-06T20:07:43.292Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:07:43.292Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:43.292Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:07:43.292Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:07:43.292Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:43.293Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:07:43.293Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:07:43.293Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:07:43.293Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:07:43.293Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:16.886Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:16.886Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:10:16.977Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:10:16.982Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 2
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:10:16.982Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:10:16.983Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+Traceback (most recent call last):
+  File "/Users/ianphil/src/promptbin/mcp_server.py", line 19, in <module>
+    from mcp.server.fastmcp import FastMCP
+ModuleNotFoundError: No module named 'mcp'
+2025-09-06T20:10:17.030Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:10:17.030Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:17.030Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:10:17.030Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:10:17.030Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:22.764Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:10:22.767Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:10:22.775Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/venv/bin/python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:10:22.776Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/venv/bin/python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:10:22.775Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:10:22.776Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+error: Failed to spawn: `/Users/ianphil/src/promptbin/venv/bin/python`
+  Caused by: No such file or directory (os error 2)
+error: Failed to spawn: `/Users/ianphil/src/promptbin/venv/bin/python`
+  Caused by: No such file or directory (os error 2)
+2025-09-06T20:10:22.782Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:10:22.782Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:22.782Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:10:22.782Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:10:22.783Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:22.783Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:10:22.783Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:10:22.783Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:10:22.783Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:10:22.783Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:11:16.784Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:11:16.784Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:11:16.895Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:11:21.474Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:11:21.477Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:11:21.485Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/venv/bin/python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:11:21.486Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/venv/bin/python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:11:21.485Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:11:21.486Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+error: Failed to spawn: `/Users/ianphil/src/promptbin/venv/bin/python`
+  Caused by: No such file or directory (os error 2)
+error: Failed to spawn: `/Users/ianphil/src/promptbin/venv/bin/python`
+  Caused by: No such file or directory (os error 2)
+2025-09-06T20:11:21.492Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:11:21.493Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:11:21.493Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:12:01.452Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:12:01.452Z [PromptBin] [info] Shutting down server... { metadata: undefined }
+2025-09-06T20:12:01.563Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:12:05.701Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:12:05.704Z [PromptBin] [info] Initializing server... { metadata: undefined }
+2025-09-06T20:12:05.711Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/.venv/bin/python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:12:05.712Z [PromptBin] [info] Using MCP server command: /Users/ianphil/.local/bin/uv with args and path: {
+  metadata: {
+    args: [
+      'run',
+      '/Users/ianphil/src/promptbin/.venv/bin/python',
+      '/Users/ianphil/src/promptbin/mcp_server.py',
+      [length]: 3
+    ],
+    paths: [
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      '/usr/bin',
+      '/usr/bin',
+      '/bin',
+      '/usr/sbin',
+      '/sbin',
+      [length]: 7
+    ]
+  }
+} %o
+2025-09-06T20:12:05.712Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:12:05.713Z [PromptBin] [info] Server started and connected successfully { metadata: undefined }
+2025-09-06T20:12:05.727Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+2025-09-06T20:12:05.727Z [PromptBin] [info] Message from client: {"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"claude-ai","version":"0.1.0"}},"jsonrpc":"2.0","id":0} { metadata: undefined }
+ERROR:prompt_manager:Error creating directories: [Errno 30] Read-only file system: 'prompts'
+ERROR:root:Fatal error: [Errno 30] Read-only file system: 'prompts'
+ERROR:prompt_manager:Error creating directories: [Errno 30] Read-only file system: 'prompts'
+ERROR:root:Fatal error: [Errno 30] Read-only file system: 'prompts'
+2025-09-06T20:12:06.641Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:12:06.642Z [PromptBin] [info] Server transport closed { metadata: undefined }
+2025-09-06T20:12:06.641Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:12:06.641Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:12:06.641Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:12:06.642Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:12:06.642Z [PromptBin] [info] Client transport closed { metadata: undefined }
+2025-09-06T20:12:06.642Z [PromptBin] [info] Server transport closed unexpectedly, this is likely due to the process exiting early. If you are developing this MCP server you can add output to stderr (i.e. `console.error('...')` in JavaScript, `print('...', file=sys.stderr)` in python) and it will appear in this log. { metadata: undefined }
+2025-09-06T20:12:06.642Z [PromptBin] [error] Server disconnected. For troubleshooting guidance, please visit our [debugging documentation](https://modelcontextprotocol.io/docs/tools/debugging) { metadata: { context: 'connection', stack: undefined } }
+2025-09-06T20:12:06.642Z [PromptBin] [info] Client transport closed { metadata: undefined }

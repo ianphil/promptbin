@@ -1,19 +1,35 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import re
+import time
+import argparse
+import logging
 from dotenv import load_dotenv
 from prompt_manager import PromptManager
 from share_manager import ShareManager
 import markdown
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:  # pragma: no cover
+    tomllib = None
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['START_TIME'] = time.time()
+app.config['MODE'] = 'standalone'
 
-# Initialize the prompt manager and share manager
-prompt_manager = PromptManager()
-share_manager = ShareManager()
+# Initialize managers with defaults (may be updated when app starts)
+share_manager = None  # Will be initialized after parsing args
+prompt_manager = PromptManager()  # Default initialization
+
+# Helper function to get share_manager
+def get_share_manager():
+    global share_manager
+    if share_manager is None:
+        share_manager = ShareManager()  # Use default path as fallback
+    return share_manager
 
 # Add custom Jinja2 filter for regex operations
 @app.template_filter('regex_findall')
@@ -88,6 +104,46 @@ def htmx_navigation():
     category = request.args.get('category')
     stats = prompt_manager.get_stats()
     return render_template('partials/navigation.html', stats=stats, selected_category=category)
+
+@app.route('/health')
+def health():
+    """Health check endpoint for subprocess monitoring"""
+    try:
+        uptime = int(time.time() - app.config.get('START_TIME', time.time()))
+        mode = app.config.get('MODE', 'standalone')
+
+        # Derive version from pyproject if possible
+        version = "0.1.0"
+        try:
+            pyproject_path = os.path.join(os.path.dirname(__file__), 'pyproject.toml')
+            if tomllib and os.path.exists(pyproject_path):
+                with open(pyproject_path, 'rb') as f:
+                    data = tomllib.load(f)
+                    version = data.get('project', {}).get('version', version)
+        except Exception:
+            pass
+
+        try:
+            stats = prompt_manager.get_stats()
+            prompts_count = stats.get('total_prompts', 0) if stats else 0
+        except Exception as e:
+            logging.warning(f"Error calculating prompt stats: {e}")
+            prompts_count = 0
+            
+        return jsonify({
+            'status': 'healthy',
+            'uptime': uptime,
+            'mode': mode,
+            'version': version,
+            'prompts_count': prompts_count
+        })
+    except Exception:
+        return jsonify({'status': 'unhealthy'}), 500
+
+@app.route('/mcp-status')
+def mcp_status():
+    """Status endpoint indicating MCP integration mode"""
+    return jsonify({'mode': app.config.get('MODE', 'standalone')})
 
 @app.route('/api/prompts', methods=['POST'])
 def create_prompt():
@@ -242,7 +298,7 @@ def create_share_link(prompt_id):
         expires_in_hours = data.get('expires_in_hours')
         
         # Create share token
-        token = share_manager.create_share_token(prompt_id, expires_in_hours)
+        token = get_share_manager().create_share_token(prompt_id, expires_in_hours)
         
         # Generate full shareable URL
         base_url = request.url_root.rstrip('/')
@@ -263,7 +319,7 @@ def view_shared_prompt(token, prompt_id):
     """Public view for shared prompts"""
     try:
         # Validate share token
-        validated_prompt_id = share_manager.validate_share_token(token)
+        validated_prompt_id = get_share_manager().validate_share_token(token)
         
         if not validated_prompt_id or validated_prompt_id != prompt_id:
             return render_template('404.html'), 404
@@ -274,7 +330,7 @@ def view_shared_prompt(token, prompt_id):
             return render_template('404.html'), 404
         
         # Get share info for analytics
-        share_info = share_manager.get_share_info(token)
+        share_info = get_share_manager().get_share_info(token)
         
         return render_template('share.html', 
                              prompt=prompt, 
@@ -298,5 +354,34 @@ def internal_error(error):
     """500 error handler"""
     return render_template('500.html'), 500
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Run PromptBin Flask app')
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--port', type=int, default=5001)
+    parser.add_argument('--mode', choices=['standalone', 'mcp-managed'], default='standalone')
+    parser.add_argument('--log-level', default=os.environ.get('PROMPTBIN_LOG_LEVEL', 'INFO'))
+    parser.add_argument('--data-dir', default=os.path.expanduser('~/promptbin-data'))
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    args = parse_args()
+
+    # Configure logging
+    logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
+
+    # Reinitialize prompt manager with the parsed data directory
+    prompt_manager = PromptManager(data_dir=args.data_dir)
+    
+    # Reinitialize share manager with the parsed data directory
+    share_file = os.path.join(args.data_dir, 'shares.json')
+    share_manager = ShareManager(share_file=share_file)
+
+    # Apply mode and start time
+    app.config['MODE'] = args.mode
+    app.config['START_TIME'] = time.time()
+
+    # Debug mode only for standalone
+    debug = args.mode != 'mcp-managed'
+
+    app.run(host=args.host, port=args.port, debug=debug)

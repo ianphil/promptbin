@@ -27,9 +27,10 @@ class PromptBinMCPServer:
         """Initialize the MCP server with configuration"""
         self.config = config or self._load_default_config()
         self.mcp = FastMCP("PromptBin")
-        self.prompt_manager = PromptManager()
+        self.prompt_manager = PromptManager(data_dir=self.config['data_dir'])
         self.flask_process = None
         self.is_running = False
+        self.flask_manager = None
         
         # Set up logging
         self._setup_logging()
@@ -41,17 +42,36 @@ class PromptBinMCPServer:
         # Register MCP protocol handlers
         self._register_mcp_handlers()
         
+        # Start Flask manager setup (will be started when MCP server runs)
+        self._setup_flask_manager()
+        
         self.logger.info("PromptBin MCP Server initialized")
         self.logger.debug(f"Configuration: {self._safe_config_log()}")
     
+    def _setup_flask_manager(self):
+        """Setup Flask manager (but don't start yet)"""
+        try:
+            from flask_manager import FlaskManager
+            self.flask_manager = FlaskManager(
+                host=self.config['flask_host'],
+                base_port=self.config['flask_port'],
+                log_level=self.config['log_level'],
+                data_dir=self.config['data_dir'],
+                health_check_interval=self.config['health_check_interval'],
+                shutdown_timeout=self.config['shutdown_timeout'],
+            )
+            self.logger.info("Flask manager configured")
+        except Exception as e:
+            self.logger.error(f"Error setting up Flask manager: {e}")
+    
     def _load_default_config(self) -> Dict[str, Any]:
-        """Load default configuration with environment variable overrides"""
+        """Hardcoded-first configuration with sensible defaults"""
         return {
-            'mode': os.getenv('PROMPTBIN_MODE', 'mcp-managed'),
-            'flask_port': int(os.getenv('PROMPTBIN_PORT', '5000')),
-            'flask_host': os.getenv('PROMPTBIN_HOST', '127.0.0.1'),
-            'log_level': os.getenv('PROMPTBIN_LOG_LEVEL', 'INFO'),
-            'data_dir': os.getenv('PROMPTBIN_DATA_DIR', str(Path('prompts').absolute())),
+            'mode': 'mcp-managed',
+            'flask_port': 5001,
+            'flask_host': '127.0.0.1',
+            'log_level': 'INFO',
+            'data_dir': os.path.expanduser('~/promptbin-data'),
             'health_check_interval': 30,
             'shutdown_timeout': 10,
         }
@@ -280,43 +300,19 @@ class PromptBinMCPServer:
                 self.logger.error(f"Error getting prompt by name '{name}': {e}")
                 raise ValueError(f"Failed to get prompt '{name}': {str(e)}")
         
+        @self.mcp.resource("promptbin://flask-status")
+        def flask_status() -> Dict[str, Any]:
+            try:
+                status = {}
+                if hasattr(self, 'flask_manager') and self.flask_manager:
+                    status = self.flask_manager.flask_status()
+                return status
+            except Exception as e:
+                self.logger.error(f"Error getting Flask status: {e}")
+                return {"error": str(e)}
+
         self.logger.info("MCP protocol handlers registered successfully")
     
-    async def start(self):
-        """Start the MCP server and Flask subprocess"""
-        if self.is_running:
-            self.logger.warning("Server is already running")
-            return
-        
-        try:
-            self.logger.info("Starting PromptBin MCP Server...")
-            
-            # Verify PromptManager is working
-            prompts = self.prompt_manager.list_prompts()
-            self.logger.info(f"PromptManager initialized - {len(prompts)} prompts available")
-            
-            # MCP protocol handlers already registered in __init__
-            # Available endpoints:
-            # - promptbin://list-prompts (resource)
-            # - promptbin://get-prompt/{id} (resource)  
-            # - search_prompts (tool)
-            # - promptbin://get-prompt-by-name/{name} (resource)
-            
-            # TODO Phase 3: Start Flask subprocess
-            # - Launch Flask app as subprocess
-            # - Set up health monitoring
-            # - Configure port management
-            
-            self.is_running = True
-            self.logger.info("MCP Server started successfully")
-            
-            # Keep the server running
-            while self.is_running:
-                await asyncio.sleep(1)
-                
-        except Exception as e:
-            self.logger.error(f"Error starting MCP server: {e}")
-            raise
     
     async def shutdown(self):
         """Gracefully shutdown the MCP server and cleanup resources"""
@@ -327,10 +323,9 @@ class PromptBinMCPServer:
         self.is_running = False
         
         try:
-            # TODO Phase 3: Stop Flask subprocess gracefully
-            # - Send SIGTERM to Flask process
-            # - Wait for clean termination
-            # - Force kill if necessary
+            # Phase 3: Stop Flask subprocess gracefully
+            if hasattr(self, 'flask_manager') and self.flask_manager:
+                await self.flask_manager.stop_flask()
             
             self.logger.info("MCP Server shutdown complete")
             
@@ -339,12 +334,14 @@ class PromptBinMCPServer:
             raise
 
 
-async def main():
+def main():
     """Main entry point for the MCP server"""
     server = None
     try:
         server = PromptBinMCPServer()
-        await server.start()
+        
+        # Start the MCP server directly using FastMCP's synchronous run method
+        server.mcp.run()
     except KeyboardInterrupt:
         pass
     except Exception as e:
@@ -352,11 +349,15 @@ async def main():
         return 1
     finally:
         if server:
-            await server.shutdown()
+            try:
+                # Use asyncio.run for the shutdown method
+                asyncio.run(server.shutdown())
+            except Exception as shutdown_error:
+                logging.error(f"Error during shutdown: {shutdown_error}")
     
     return 0
 
 
 if __name__ == "__main__":
-    exit_code = asyncio.run(main())
+    exit_code = main()
     sys.exit(exit_code)
