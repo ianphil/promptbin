@@ -49,12 +49,19 @@ ChatGPT Desktop (Mac/Windows):
 - Working directory: path to this repo.
 
 Claude Desktop (Mac/Windows):
-- Open Settings → Developer → Model Context Protocol.
-- Click “Add Server”.
-- Name: PromptBin
-- Command: `uv`
-- Args: `run python mcp_server.py`
-- Working directory: path to this repo.
+- Open Settings → Developer → Edit Config
+
+```json
+"PromptBin": {
+            "command": "/Users/ianphil/.local/bin/uv",
+            "args": [
+                "run",
+                "/Users/ianphil/src/promptbin/.venv/bin/python",
+                "/Users/ianphil/src/promptbin/mcp_server.py"
+            ],
+            "workingDirectory": "/Users/ianphil/src/promptbin"
+        }
+```
 
 Notes:
 - After adding, you can list/search prompts via the PromptBin MCP tools. The MCP server also starts the local web UI on `http://127.0.0.1:<port>`.
