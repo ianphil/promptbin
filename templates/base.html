@@ -57,7 +57,13 @@
                 </div>
                 
                 <div class="tunnel-status">
-                    <!-- Tunnel status indicator will go here -->
+                    <span id="tunnel-status-indicator">
+                        <span class="status-dot" id="tunnel-status-dot"></span>
+                        <span id="tunnel-status-text">Tunnel: Inactive</span>
+                    </span>
+                    <button id="tunnel-url-copy" style="display: none;" onclick="copyTunnelUrl()" title="Copy tunnel URL">
+                        📋
+                    </button>
                 </div>
             </div>
         </header>
@@ -78,7 +84,21 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="tunnel-controls">
-                    <!-- Tunnel controls will go here -->
+                    <button id="start-tunnel-btn" onclick="startTunnel()" class="tunnel-btn">
+                        Start Tunnel
+                    </button>
+                    <button id="stop-tunnel-btn" onclick="stopTunnel()" class="tunnel-btn" style="display: none;">
+                        Stop Tunnel
+                    </button>
+                    <div id="tunnel-url-display" style="display: none;">
+                        <span>Tunnel: </span>
+                        <a id="tunnel-url-link" href="#" target="_blank"></a>
+                        <button onclick="copyTunnelUrl()" title="Copy URL">📋</button>
+                    </div>
+                    <div id="tunnel-loading" style="display: none;">
+                        <span>⚡ Starting tunnel...</span>
+                    </div>
+                    <div id="tunnel-error" style="display: none; color: #dc2626;"></div>
                 </div>
             </div>
         </footer>
@@ -261,7 +281,9 @@
                 if (result.status === 'success') {
                     // Copy the shareable URL to clipboard
                     navigator.clipboard.writeText(result.share_url).then(function() {
-                        showNotification('Share link copied to clipboard!', 'success');
+                        const tunnelActive = document.getElementById('tunnel-status-dot').classList.contains('active');
+                        const linkType = tunnelActive ? 'Public share link' : 'Share link';
+                        showNotification(linkType + ' copied to clipboard!', 'success');
                     }).catch(function(err) {
                         // Fallback - show the URL in a prompt
                         console.error('Clipboard API failed:', err);
@@ -277,6 +299,139 @@
                 showNotification('Failed to create share link. Please try again.', 'error');
             });
         }
+        
+        // Tunnel management functions
+        let currentTunnelUrl = null;
+        
+        function startTunnel() {
+            const startBtn = document.getElementById('start-tunnel-btn');
+            const loading = document.getElementById('tunnel-loading');
+            const errorDiv = document.getElementById('tunnel-error');
+            
+            // Show loading state
+            startBtn.style.display = 'none';
+            loading.style.display = 'block';
+            errorDiv.style.display = 'none';
+            
+            fetch('/api/tunnel/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                loading.style.display = 'none';
+                
+                if (result.status === 'success') {
+                    showNotification('Tunnel started successfully!', 'success');
+                    updateTunnelStatus();
+                } else {
+                    showNotification('Error: ' + result.message, 'error');
+                    errorDiv.textContent = result.message;
+                    errorDiv.style.display = 'block';
+                    startBtn.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Tunnel start error:', error);
+                showNotification('Failed to start tunnel. Please try again.', 'error');
+                loading.style.display = 'none';
+                startBtn.style.display = 'block';
+            });
+        }
+        
+        function stopTunnel() {
+            if (confirm('Are you sure you want to stop the tunnel? This will make shared links inaccessible.')) {
+                const stopBtn = document.getElementById('stop-tunnel-btn');
+                stopBtn.disabled = true;
+                stopBtn.textContent = 'Stopping...';
+                
+                fetch('/api/tunnel/stop', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        showNotification('Tunnel stopped successfully.', 'info');
+                        updateTunnelStatus();
+                    } else {
+                        showNotification('Error: ' + result.message, 'error');
+                    }
+                    stopBtn.disabled = false;
+                    stopBtn.textContent = 'Stop Tunnel';
+                })
+                .catch(error => {
+                    console.error('Tunnel stop error:', error);
+                    showNotification('Failed to stop tunnel.', 'error');
+                    stopBtn.disabled = false;
+                    stopBtn.textContent = 'Stop Tunnel';
+                });
+            }
+        }
+        
+        function updateTunnelStatus() {
+            fetch('/api/tunnel/status')
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const data = result.data;
+                    const statusDot = document.getElementById('tunnel-status-dot');
+                    const statusText = document.getElementById('tunnel-status-text');
+                    const startBtn = document.getElementById('start-tunnel-btn');
+                    const stopBtn = document.getElementById('stop-tunnel-btn');
+                    const urlDisplay = document.getElementById('tunnel-url-display');
+                    const urlLink = document.getElementById('tunnel-url-link');
+                    const urlCopyBtn = document.getElementById('tunnel-url-copy');
+                    
+                    if (data.active && data.tunnel_url) {
+                        // Tunnel is active
+                        statusDot.className = 'status-dot active';
+                        statusText.textContent = 'Tunnel: Active';
+                        startBtn.style.display = 'none';
+                        stopBtn.style.display = 'block';
+                        urlDisplay.style.display = 'block';
+                        urlCopyBtn.style.display = 'inline';
+                        urlLink.href = data.tunnel_url;
+                        urlLink.textContent = data.tunnel_url;
+                        currentTunnelUrl = data.tunnel_url;
+                    } else {
+                        // Tunnel is inactive
+                        statusDot.className = 'status-dot';
+                        statusText.textContent = 'Tunnel: Inactive';
+                        startBtn.style.display = 'block';
+                        stopBtn.style.display = 'none';
+                        urlDisplay.style.display = 'none';
+                        urlCopyBtn.style.display = 'none';
+                        currentTunnelUrl = null;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching tunnel status:', error);
+            });
+        }
+        
+        function copyTunnelUrl() {
+            if (currentTunnelUrl) {
+                navigator.clipboard.writeText(currentTunnelUrl).then(function() {
+                    showNotification('Tunnel URL copied to clipboard!', 'success');
+                }).catch(function(err) {
+                    console.error('Clipboard API failed:', err);
+                    prompt('Copy this tunnel URL:', currentTunnelUrl);
+                });
+            }
+        }
+        
+        // Update tunnel status on page load and periodically
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTunnelStatus();
+            // Check status every 30 seconds
+            setInterval(updateTunnelStatus, 30000);
+        });
     </script>
 
     {% block scripts %}{% endblock %}

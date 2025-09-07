@@ -7,6 +7,7 @@ import logging
 from dotenv import load_dotenv
 from prompt_manager import PromptManager
 from share_manager import ShareManager
+from tunnel_manager import TunnelManager
 import markdown
 try:
     import tomllib  # Python 3.11+
@@ -23,6 +24,7 @@ app.config['MODE'] = 'standalone'
 # Initialize managers with defaults (may be updated when app starts)
 share_manager = None  # Will be initialized after parsing args
 prompt_manager = PromptManager()  # Default initialization
+tunnel_manager = None  # Will be initialized with flask port
 
 # Helper function to get share_manager
 def get_share_manager():
@@ -30,6 +32,15 @@ def get_share_manager():
     if share_manager is None:
         share_manager = ShareManager()  # Use default path as fallback
     return share_manager
+
+# Helper function to get tunnel_manager  
+def get_tunnel_manager():
+    global tunnel_manager
+    if tunnel_manager is None:
+        # Use the same port that Flask is running on
+        flask_port = int(os.environ.get('FLASK_RUN_PORT', 5001))
+        tunnel_manager = TunnelManager(flask_port=flask_port)
+    return tunnel_manager
 
 # Add custom Jinja2 filter for regex operations
 @app.template_filter('regex_findall')
@@ -153,13 +164,22 @@ def health():
         except Exception as e:
             logging.warning(f"Error calculating prompt stats: {e}")
             prompts_count = 0
+        
+        # Get tunnel status
+        try:
+            tunnel_status = get_tunnel_manager().get_status()
+        except Exception as e:
+            logging.warning(f"Error getting tunnel status: {e}")
+            tunnel_status = {'active': False}
             
         return jsonify({
             'status': 'healthy',
             'uptime': uptime,
             'mode': mode,
             'version': version,
-            'prompts_count': prompts_count
+            'prompts_count': prompts_count,
+            'tunnel_active': tunnel_status.get('active', False),
+            'tunnel_url': tunnel_status.get('tunnel_url')
         })
     except Exception:
         return jsonify({'status': 'unhealthy'}), 500
@@ -324,8 +344,12 @@ def create_share_link(prompt_id):
         # Create share token
         token = get_share_manager().create_share_token(prompt_id, expires_in_hours)
         
-        # Generate full shareable URL
-        base_url = request.url_root.rstrip('/')
+        # Generate full shareable URL - use tunnel URL if available
+        tunnel_url = get_tunnel_manager().get_tunnel_url()
+        if tunnel_url:
+            base_url = tunnel_url
+        else:
+            base_url = request.url_root.rstrip('/')
         share_url = f"{base_url}/share/{token}/{prompt_id}"
         
         return jsonify({
@@ -337,6 +361,73 @@ def create_share_link(prompt_id):
         
     except Exception as e:
         return jsonify({'status': 'error', 'message': 'Failed to create share link'}), 500
+
+@app.route('/api/tunnel/start', methods=['POST'])
+def start_tunnel():
+    """API endpoint to start devtunnel"""
+    try:
+        client_ip = request.environ.get('REMOTE_ADDR', '127.0.0.1')
+        result = get_tunnel_manager().start_tunnel(client_ip)
+        
+        if result['status'] == 'success':
+            return jsonify(result)
+        else:
+            return jsonify(result), 400
+            
+    except Exception as e:
+        logging.error(f"Error starting tunnel: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
+
+@app.route('/api/tunnel/stop', methods=['POST'])
+def stop_tunnel():
+    """API endpoint to stop devtunnel"""
+    try:
+        result = get_tunnel_manager().stop_tunnel()
+        return jsonify(result)
+        
+    except Exception as e:
+        logging.error(f"Error stopping tunnel: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
+
+@app.route('/api/tunnel/status')
+def get_tunnel_status():
+    """API endpoint to get current tunnel status"""
+    try:
+        status = get_tunnel_manager().get_status()
+        return jsonify({
+            'status': 'success',
+            'data': status
+        })
+        
+    except Exception as e:
+        logging.error(f"Error getting tunnel status: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
+
+@app.route('/api/tunnel/url')
+def get_tunnel_url():
+    """API endpoint to get active tunnel URL"""
+    try:
+        tunnel_url = get_tunnel_manager().get_tunnel_url()
+        return jsonify({
+            'status': 'success',
+            'tunnel_url': tunnel_url
+        })
+        
+    except Exception as e:
+        logging.error(f"Error getting tunnel URL: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
 
 @app.route('/share/<token>/<prompt_id>')
 def view_shared_prompt(token, prompt_id):
@@ -400,6 +491,9 @@ if __name__ == '__main__':
     # Reinitialize share manager with the parsed data directory
     share_file = os.path.join(args.data_dir, 'shares.json')
     share_manager = ShareManager(share_file=share_file)
+    
+    # Initialize tunnel manager with the correct Flask port
+    tunnel_manager = TunnelManager(flask_port=args.port)
 
     # Apply mode and start time
     app.config['MODE'] = args.mode

@@ -1053,3 +1053,148 @@ input:focus, select:focus, textarea:focus {
         gap: 0.5rem;
     }
 }
+
+/* Tunnel status and controls */
+.tunnel-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+#tunnel-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #dc2626; /* Red for inactive */
+    transition: background-color 0.3s ease;
+}
+
+.status-dot.active {
+    background-color: #16a34a; /* Green for active */
+}
+
+#tunnel-url-copy {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.375rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.15s ease;
+}
+
+#tunnel-url-copy:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.tunnel-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.tunnel-btn {
+    padding: 0.5rem 1rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.tunnel-btn:hover {
+    background: #1d4ed8;
+}
+
+.tunnel-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+#stop-tunnel-btn {
+    background: #dc2626;
+}
+
+#stop-tunnel-btn:hover {
+    background: #b91c1c;
+}
+
+#tunnel-url-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+#tunnel-url-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-family: monospace;
+    font-size: 0.8125rem;
+}
+
+#tunnel-url-link:hover {
+    text-decoration: underline;
+}
+
+#tunnel-loading {
+    color: #059669;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#tunnel-error {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.25rem;
+    max-width: 300px;
+}
+
+/* Footer adjustments for tunnel controls */
+.footer {
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+/* Responsive tunnel controls */
+@media (max-width: 768px) {
+    .tunnel-controls {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .tunnel-status {
+        justify-content: center;
+    }
+    
+    #tunnel-url-display {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
