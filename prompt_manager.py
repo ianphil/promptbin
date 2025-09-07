@@ -239,14 +239,14 @@ class PromptManager:
     
     def search_prompts(self, query: str, category: Optional[str] = None) -> List[Dict[str, Any]]:
         """
-        Search prompts by query string
+        Search prompts by query string with highlighting support
         
         Args:
             query: Search query string (supports * wildcard)
             category: Optional category to search within
             
         Returns:
-            List of matching prompt data dictionaries
+            List of matching prompt data dictionaries with search highlighting
         """
         if not query.strip():
             return self.list_prompts(category)
@@ -262,22 +262,102 @@ class PromptManager:
                 return all_prompts
             
             for prompt in all_prompts:
-                # Search in title, content, description, and tags
-                searchable_text = ' '.join([
-                    prompt.get('title', ''),
-                    prompt.get('content', ''),
-                    prompt.get('description', ''),
-                    ' '.join(prompt.get('tags', []))
-                ]).lower()
+                prompt_copy = prompt.copy()
+                match_info = self._find_search_matches(prompt_copy, query_lower)
                 
-                if query_lower in searchable_text:
-                    matching_prompts.append(prompt)
+                if match_info['has_matches']:
+                    # Add search metadata
+                    prompt_copy['_search_highlights'] = match_info
+                    matching_prompts.append(prompt_copy)
             
             return matching_prompts
             
         except Exception as e:
             logger.error(f"Error searching prompts: {e}")
             return []
+    
+    def _find_search_matches(self, prompt: Dict[str, Any], query_lower: str) -> Dict[str, Any]:
+        """Find and return search match information for highlighting"""
+        match_info = {
+            'has_matches': False,
+            'title_snippet': '',
+            'content_snippet': '',
+            'description_snippet': '',
+            'matched_tags': []
+        }
+        
+        # Check title
+        title = prompt.get('title', '')
+        if title and query_lower in title.lower():
+            match_info['has_matches'] = True
+            snippet = self._create_highlight_snippet(title, query_lower)
+            match_info['title_snippet'] = self.highlight_text(snippet, query_lower)
+        
+        # Check content
+        content = prompt.get('content', '')
+        if content and query_lower in content.lower():
+            match_info['has_matches'] = True
+            snippet = self._create_highlight_snippet(content, query_lower, max_length=200)
+            match_info['content_snippet'] = self.highlight_text(snippet, query_lower)
+        
+        # Check description
+        description = prompt.get('description', '')
+        if description and query_lower in description.lower():
+            match_info['has_matches'] = True
+            snippet = self._create_highlight_snippet(description, query_lower)
+            match_info['description_snippet'] = self.highlight_text(snippet, query_lower)
+        
+        # Check tags
+        tags = prompt.get('tags', [])
+        for tag in tags:
+            if query_lower in tag.lower():
+                match_info['has_matches'] = True
+                match_info['matched_tags'].append(tag)
+        
+        return match_info
+    
+    def _create_highlight_snippet(self, text: str, query_lower: str, max_length: int = 150) -> str:
+        """Create a text snippet with the search query highlighted"""
+        if not text or not query_lower:
+            return text[:max_length] + ('...' if len(text) > max_length else '')
+        
+        # Find the first match position (case insensitive)
+        text_lower = text.lower()
+        match_start = text_lower.find(query_lower)
+        
+        if match_start == -1:
+            return text[:max_length] + ('...' if len(text) > max_length else '')
+        
+        # Calculate snippet bounds
+        snippet_start = max(0, match_start - max_length // 3)
+        snippet_end = min(len(text), snippet_start + max_length)
+        
+        # Adjust start if we're too close to the end
+        if snippet_end - snippet_start < max_length:
+            snippet_start = max(0, snippet_end - max_length)
+        
+        snippet = text[snippet_start:snippet_end]
+        
+        # Add ellipsis if needed
+        if snippet_start > 0:
+            snippet = '...' + snippet
+        if snippet_end < len(text):
+            snippet = snippet + '...'
+        
+        return snippet
+    
+    def highlight_text(self, text: str, query: str) -> str:
+        """Apply highlighting markup to text for the given query (case insensitive)"""
+        if not text or not query:
+            return text
+        
+        import re
+        # Escape special regex characters in query
+        query_escaped = re.escape(query)
+        # Create case-insensitive pattern
+        pattern = re.compile(f'({query_escaped})', re.IGNORECASE)
+        # Replace with highlighted version
+        return pattern.sub(r'<mark class="search-highlight">\1</mark>', text)
     
     def get_stats(self) -> Dict[str, Any]:
         """Get statistics about stored prompts"""

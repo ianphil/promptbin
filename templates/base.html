@@ -25,18 +25,33 @@
                 </h1>
                 
                 <div class="search-container">
-                    <input 
-                        type="text" 
-                        placeholder="Search prompts..." 
-                        id="search-input"
-                        name="q"
-                        hx-get="{{ url_for('search_prompts') }}"
-                        hx-trigger="keyup changed delay:300ms"
-                        hx-target="#search-results"
-                        hx-swap="innerHTML"
-                        hx-indicator="#search-loading"
-                    >
-                    <div id="search-loading" class="search-loading htmx-indicator">🔍</div>
+                    <div class="search-input-group">
+                        <input 
+                            type="text" 
+                            placeholder="Search prompts..." 
+                            id="search-input"
+                            name="q"
+                            hx-get="{{ url_for('search_prompts') }}"
+                            hx-trigger="keyup changed delay:300ms"
+                            hx-target="#search-results"
+                            hx-swap="innerHTML"
+                            hx-indicator="#search-loading"
+                        >
+                        <button 
+                            type="button" 
+                            id="clear-filters-btn" 
+                            class="clear-filters-btn"
+                            title="Clear search and filters"
+                            style="display: none;"
+                            onclick="clearFilters()"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    <div id="search-loading" class="search-loading htmx-indicator">
+                        <span class="loading-spinner">⚡</span>
+                        <span class="loading-text">Searching...</span>
+                    </div>
                 </div>
                 
                 <div class="tunnel-status">
@@ -84,36 +99,90 @@
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
         const promptGrid = document.getElementById('prompt-grid');
+        const clearBtn = document.getElementById('clear-filters-btn');
+        
+        function updateClearButtonVisibility() {
+            if (clearBtn && searchInput) {
+                const hasQuery = searchInput.value.trim().length > 0;
+                const hasCategory = window.location.search.includes('category=');
+                clearBtn.style.display = (hasQuery || hasCategory) ? 'block' : 'none';
+            }
+        }
+        
+        function clearFilters() {
+            // Clear search input
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            // Hide search results and show main grid
+            if (searchResults) {
+                searchResults.style.display = 'none';
+                searchResults.innerHTML = '';
+            }
+            if (promptGrid) {
+                promptGrid.style.display = 'block';
+            }
+            
+            // Navigate to main page without category filter
+            htmx.ajax('GET', '{{ url_for("htmx_index") }}', {
+                target: '.main-content',
+                swap: 'innerHTML'
+            });
+            
+            // Update navigation to show all prompts selected
+            updateNavigation('');
+            
+            // Update URL without category
+            history.pushState(null, '', '{{ url_for("index") }}');
+            
+            // Hide clear button
+            updateClearButtonVisibility();
+        }
         
         if (searchInput) {
-            // Show search results when user starts typing
+            // Show search results when user starts typing with enhanced UX
             searchInput.addEventListener('input', function() {
                 const query = this.value.trim();
                 if (query.length > 0) {
+                    // Add searching class for enhanced styling
+                    searchInput.classList.add('searching');
                     if (searchResults) {
                         searchResults.style.display = 'block';
                         if (promptGrid) promptGrid.style.display = 'none';
                     }
                 } else {
+                    // Remove searching class
+                    searchInput.classList.remove('searching');
                     if (searchResults) {
                         searchResults.style.display = 'none';
                         if (promptGrid) promptGrid.style.display = 'block';
                     }
                 }
+                updateClearButtonVisibility();
+            });
+            
+            // Add focus/blur enhancements for better UX
+            searchInput.addEventListener('focus', function() {
+                this.placeholder = "Search by title, content, description, or tags...";
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.placeholder = "Search prompts...";
             });
             
             // Clear search on Escape
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    this.value = '';
-                    if (searchResults) {
-                        searchResults.style.display = 'none';
-                        searchResults.innerHTML = '';
-                        if (promptGrid) promptGrid.style.display = 'block';
-                    }
+                    clearFilters();
                 }
             });
         }
+        
+        // Update clear button visibility on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClearButtonVisibility();
+        });
         
         // Show/hide loading indicator
         document.addEventListener('htmx:beforeRequest', function() {
@@ -152,12 +221,24 @@
             }, 3000);
         }
         
-        // Update navigation sidebar when category changes
+        // Update navigation sidebar when category changes with visual feedback
         function updateNavigation(category) {
+            // Add loading state to navigation
+            const navContainer = document.getElementById('navigation-container');
+            if (navContainer) {
+                navContainer.classList.add('loading');
+            }
+            
             const url = '/htmx/navigation' + (category ? '?category=' + category : '');
             htmx.ajax('GET', url, {
                 target: '#navigation-container',
                 swap: 'innerHTML'
+            }).then(function() {
+                // Remove loading state after update
+                if (navContainer) {
+                    navContainer.classList.remove('loading');
+                }
+                updateClearButtonVisibility();
             });
         }
         
