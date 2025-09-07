@@ -40,6 +40,30 @@ def regex_findall_filter(text, pattern):
     except (re.error, TypeError):
         return []
 
+# Add secure highlight filter to prevent XSS
+@app.template_filter('safe_highlight')
+def safe_highlight_filter(text):
+    """Custom Jinja2 filter that only allows specific highlight markup"""
+    import html
+    from markupsafe import Markup
+    
+    if not text:
+        return text
+    
+    # First escape all HTML to prevent XSS
+    escaped_text = html.escape(str(text))
+    
+    # Only allow our specific highlight markup through
+    # Replace escaped mark tags back to HTML
+    safe_text = escaped_text.replace(
+        '&lt;mark class="search-highlight"&gt;', '<mark class="search-highlight">'
+    ).replace(
+        '&lt;/mark&gt;', '</mark>'
+    )
+    
+    # Return as safe markup since we've sanitized it
+    return Markup(safe_text)
+
 @app.route('/')
 def index():
     """Main page showing all prompts"""

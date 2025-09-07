@@ -31,6 +31,8 @@
                             placeholder="Search prompts..." 
                             id="search-input"
                             name="q"
+                            data-placeholder-default="Search prompts..."
+                            data-placeholder-focus="Search by title, content, description, or tags..."
                             hx-get="{{ url_for('search_prompts') }}"
                             hx-trigger="keyup changed delay:300ms"
                             hx-target="#search-results"
@@ -162,13 +164,13 @@
                 updateClearButtonVisibility();
             });
             
-            // Add focus/blur enhancements for better UX
+            // Add focus/blur enhancements for better UX using data attributes
             searchInput.addEventListener('focus', function() {
-                this.placeholder = "Search by title, content, description, or tags...";
+                this.placeholder = this.dataset.placeholderFocus || this.placeholder;
             });
             
             searchInput.addEventListener('blur', function() {
-                this.placeholder = "Search prompts...";
+                this.placeholder = this.dataset.placeholderDefault || "Search prompts...";
             });
             
             // Clear search on Escape

@@ -351,7 +351,6 @@ class PromptManager:
         if not text or not query:
             return text
         
-        import re
         # Escape special regex characters in query
         query_escaped = re.escape(query)
         # Create case-insensitive pattern

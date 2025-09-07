@@ -14,7 +14,7 @@
             <div class="prompt-header">
                 <h3>
                     {% if prompt._search_highlights and prompt._search_highlights.title_snippet %}
-                        {{ prompt._search_highlights.title_snippet | safe }}
+                        {{ prompt._search_highlights.title_snippet | safe_highlight }}
                     {% else %}
                         {{ prompt.title }}
                     {% endif %}
@@ -25,9 +25,9 @@
             <div class="prompt-preview">
                 {% if prompt._search_highlights %}
                     {% if prompt._search_highlights.description_snippet %}
-                        <p class="search-snippet">{{ prompt._search_highlights.description_snippet | safe }}</p>
+                        <p class="search-snippet">{{ prompt._search_highlights.description_snippet | safe_highlight }}</p>
                     {% elif prompt._search_highlights.content_snippet %}
-                        <p class="search-snippet">{{ prompt._search_highlights.content_snippet | safe }}</p>
+                        <p class="search-snippet">{{ prompt._search_highlights.content_snippet | safe_highlight }}</p>
                     {% else %}
                         <p>{{ prompt.description or (prompt.content[:100] + '...' if prompt.content|length > 100 else prompt.content) }}</p>
                     {% endif %}
