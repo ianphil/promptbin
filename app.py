@@ -479,20 +479,24 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
+    """Main entry point for the application"""
     args = parse_args()
 
     # Configure logging
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
 
     # Reinitialize prompt manager with the parsed data directory
+    global prompt_manager
     prompt_manager = PromptManager(data_dir=args.data_dir)
     
     # Reinitialize share manager with the parsed data directory
+    global share_manager
     share_file = os.path.join(args.data_dir, 'shares.json')
     share_manager = ShareManager(share_file=share_file)
     
     # Initialize tunnel manager with the correct Flask port
+    global tunnel_manager
     tunnel_manager = TunnelManager(flask_port=args.port)
 
     # Apply mode and start time
@@ -503,3 +507,7 @@ if __name__ == '__main__':
     debug = args.mode != 'mcp-managed'
 
     app.run(host=args.host, port=args.port, debug=debug)
+
+
+if __name__ == '__main__':
+    main()
