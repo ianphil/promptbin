@@ -54,9 +54,9 @@ def safe_highlight_filter(text):
     escaped_text = html.escape(str(text))
     
     # Only allow our specific highlight markup through
-    # Replace escaped mark tags back to HTML
+    # Replace escaped mark tags back to HTML (handle both quote styles)
     safe_text = escaped_text.replace(
-        '&lt;mark class="search-highlight"&gt;', '<mark class="search-highlight">'
+        '&lt;mark class=&quot;search-highlight&quot;&gt;', '<mark class="search-highlight">'
     ).replace(
         '&lt;/mark&gt;', '</mark>'
     )
