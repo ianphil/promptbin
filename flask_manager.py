@@ -26,7 +26,7 @@ def find_available_port(start_port: int = 5000, max_tries: int = 50) -> int:
 @dataclass
 class FlaskManager:
     host: str = "127.0.0.1"
-    base_port: int = 5000
+    base_port: int = 5001
     log_level: str = "INFO"
     data_dir: str = os.path.expanduser("~/promptbin-data")
     health_check_interval: int = 30
@@ -45,9 +45,13 @@ class FlaskManager:
             return
 
         self.port = find_available_port(self.base_port)
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        app_path = os.path.join(script_dir, "app.py")
+        
         cmd = [
             sys.executable,
-            "app.py",
+            app_path,
             "--mode",
             "mcp-managed",
             "--host",
@@ -61,8 +65,15 @@ class FlaskManager:
         ]
 
         self._logger.info(f"Starting Flask on {self.host}:{self.port} ...")
-        self.process = await asyncio.create_subprocess_exec(*cmd)
+        self.process = await asyncio.create_subprocess_exec(
+            *cmd, 
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL
+        )
 
+        # Give Flask a moment to start up before health checking
+        await asyncio.sleep(2)
+        
         # Wait for health
         ready = await self._wait_until_healthy(timeout=30)
         if not ready:
@@ -126,8 +137,13 @@ class FlaskManager:
         try:
             url = f"http://{self.host}:{self.port}/health"
             resp = await asyncio.to_thread(requests.get, url, timeout=3)
-            return resp.ok and resp.json().get("status") == "healthy"
-        except Exception:
+            json_data = resp.json() if resp.ok else {}
+            is_healthy = resp.ok and json_data.get("status") == "healthy"
+            if not is_healthy:
+                self._logger.warning(f"Health check failed: status={resp.status_code}, data={json_data}")
+            return is_healthy
+        except Exception as e:
+            self._logger.warning(f"Health check exception: {e}")
             return False
 
     async def _wait_until_healthy(self, timeout: int = 30) -> bool:

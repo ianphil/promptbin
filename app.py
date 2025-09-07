@@ -21,8 +21,15 @@ app.config['START_TIME'] = time.time()
 app.config['MODE'] = 'standalone'
 
 # Initialize managers with defaults (may be updated when app starts)
-share_manager = ShareManager()
+share_manager = None  # Will be initialized after parsing args
 prompt_manager = PromptManager()  # Default initialization
+
+# Helper function to get share_manager
+def get_share_manager():
+    global share_manager
+    if share_manager is None:
+        share_manager = ShareManager()  # Use default path as fallback
+    return share_manager
 
 # Add custom Jinja2 filter for regex operations
 @app.template_filter('regex_findall')
@@ -115,13 +122,18 @@ def health():
         except Exception:
             pass
 
-        stats = prompt_manager.get_stats()
+        try:
+            stats = prompt_manager.get_stats()
+            prompts_count = stats.get('total_prompts', 0) if stats else 0
+        except Exception:
+            prompts_count = 0
+            
         return jsonify({
             'status': 'healthy',
             'uptime': uptime,
             'mode': mode,
             'version': version,
-            'prompts_count': stats.get('total_prompts', 0)
+            'prompts_count': prompts_count
         })
     except Exception:
         return jsonify({'status': 'unhealthy'}), 500
@@ -284,7 +296,7 @@ def create_share_link(prompt_id):
         expires_in_hours = data.get('expires_in_hours')
         
         # Create share token
-        token = share_manager.create_share_token(prompt_id, expires_in_hours)
+        token = get_share_manager().create_share_token(prompt_id, expires_in_hours)
         
         # Generate full shareable URL
         base_url = request.url_root.rstrip('/')
@@ -305,7 +317,7 @@ def view_shared_prompt(token, prompt_id):
     """Public view for shared prompts"""
     try:
         # Validate share token
-        validated_prompt_id = share_manager.validate_share_token(token)
+        validated_prompt_id = get_share_manager().validate_share_token(token)
         
         if not validated_prompt_id or validated_prompt_id != prompt_id:
             return render_template('404.html'), 404
@@ -316,7 +328,7 @@ def view_shared_prompt(token, prompt_id):
             return render_template('404.html'), 404
         
         # Get share info for analytics
-        share_info = share_manager.get_share_info(token)
+        share_info = get_share_manager().get_share_info(token)
         
         return render_template('share.html', 
                              prompt=prompt, 
@@ -343,7 +355,7 @@ def internal_error(error):
 def parse_args():
     parser = argparse.ArgumentParser(description='Run PromptBin Flask app')
     parser.add_argument('--host', default='127.0.0.1')
-    parser.add_argument('--port', type=int, default=5000)
+    parser.add_argument('--port', type=int, default=5001)
     parser.add_argument('--mode', choices=['standalone', 'mcp-managed'], default='standalone')
     parser.add_argument('--log-level', default=os.environ.get('PROMPTBIN_LOG_LEVEL', 'INFO'))
     parser.add_argument('--data-dir', default=os.path.expanduser('~/promptbin-data'))
@@ -358,6 +370,10 @@ if __name__ == '__main__':
 
     # Reinitialize prompt manager with the parsed data directory
     prompt_manager = PromptManager(data_dir=args.data_dir)
+    
+    # Reinitialize share manager with the parsed data directory
+    share_file = os.path.join(args.data_dir, 'shares.json')
+    share_manager = ShareManager(share_file=share_file)
 
     # Apply mode and start time
     app.config['MODE'] = args.mode

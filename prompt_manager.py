@@ -238,7 +238,7 @@ class PromptManager:
         Search prompts by query string
         
         Args:
-            query: Search query string
+            query: Search query string (supports * wildcard)
             category: Optional category to search within
             
         Returns:
@@ -251,7 +251,11 @@ class PromptManager:
             all_prompts = self.list_prompts(category)
             matching_prompts = []
             
-            query_lower = query.lower()
+            query_lower = query.lower().strip()
+            
+            # Handle wildcard searches
+            if query_lower == '*' or query_lower == '**':
+                return all_prompts
             
             for prompt in all_prompts:
                 # Search in title, content, description, and tags
@@ -287,19 +291,23 @@ class PromptManager:
                 stats['total_prompts'] += len(prompts)
                 
                 for prompt in prompts:
+                    if prompt is None:
+                        continue
                     # Collect unique tags
                     stats['total_tags'].update(prompt.get('tags', []))
                     
-                    # Track recent activity (last 10)
-                    stats['recent_activity'].append({
-                        'id': prompt['id'],
-                        'title': prompt['title'],
-                        'category': prompt['category'],
-                        'updated_at': prompt['updated_at']
-                    })
+                    # Track recent activity (last 10) - safely get required fields
+                    if all(key in prompt for key in ['id', 'title', 'category', 'updated_at']):
+                        stats['recent_activity'].append({
+                            'id': prompt['id'],
+                            'title': prompt['title'],
+                            'category': prompt['category'],
+                            'updated_at': prompt['updated_at']
+                        })
             
             # Sort recent activity and limit to 10
-            stats['recent_activity'].sort(
+            stats['recent_activity'] = sorted(
+                stats['recent_activity'],
                 key=lambda x: x['updated_at'], 
                 reverse=True
             )[:10]
