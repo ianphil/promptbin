@@ -3,6 +3,7 @@ import time
 import re
 import logging
 import atexit
+import os
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
@@ -21,8 +22,23 @@ class TunnelManager:
         self.tunnel_url = None
         self.tunnel_id = None
         self._ip_attempts = defaultdict(list)  # IP -> list of attempt timestamps
-        self._rate_limit = 5  # Max attempts per IP
-        self._rate_limit_window = timedelta(minutes=30)  # Time window for rate limiting
+        
+        # Read configuration from environment variables
+        self._enabled = os.environ.get('DEVTUNNEL_ENABLED', 'true').lower() == 'true'
+        self._rate_limit = int(os.environ.get('DEVTUNNEL_RATE_LIMIT', '5'))
+        self._auto_start = os.environ.get('DEVTUNNEL_AUTO_START', 'false').lower() == 'true'
+        
+        # Rate limit window in minutes
+        rate_window_minutes = int(os.environ.get('DEVTUNNEL_RATE_WINDOW', '30'))
+        self._rate_limit_window = timedelta(minutes=rate_window_minutes)
+        
+        # Configure logging level for tunnel operations
+        log_level = os.environ.get('DEVTUNNEL_LOG_LEVEL', 'info').upper()
+        if log_level in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
+            logger.setLevel(getattr(logging, log_level))
+        
+        # Log configuration
+        logger.info(f"TunnelManager initialized: enabled={self._enabled}, rate_limit={self._rate_limit}, auto_start={self._auto_start}")
         
         # Register cleanup on exit - let Flask handle signals
         atexit.register(self.cleanup)
@@ -138,6 +154,13 @@ class TunnelManager:
         Start the devtunnel process.
         Returns dict with status, message, and tunnel_url if successful.
         """
+        # Check if tunnels are enabled
+        if not self._enabled:
+            return {
+                'status': 'error',
+                'message': 'Dev Tunnels are disabled. Set DEVTUNNEL_ENABLED=true to enable.'
+            }
+            
         # Check if tunnel is already running
         if self.is_tunnel_active():
             return {
@@ -323,3 +346,28 @@ class TunnelManager:
         """Reset all rate limiting counters (for manual admin reset)"""
         self._ip_attempts.clear()
         logger.info("Rate limiting counters reset")
+    
+    @property
+    def is_enabled(self) -> bool:
+        """Check if Dev Tunnels are enabled"""
+        return self._enabled
+    
+    @property
+    def auto_start_enabled(self) -> bool:
+        """Check if auto-start is enabled"""
+        return self._auto_start
+    
+    @property
+    def rate_limit(self) -> int:
+        """Get current rate limit setting"""
+        return self._rate_limit
+    
+    def get_configuration(self) -> Dict[str, Any]:
+        """Get current tunnel configuration"""
+        return {
+            'enabled': self._enabled,
+            'auto_start': self._auto_start,
+            'rate_limit': self._rate_limit,
+            'rate_window_minutes': self._rate_limit_window.total_seconds() / 60,
+            'log_level': logger.getEffectiveLevel()
+        }
