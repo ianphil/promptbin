@@ -2,7 +2,6 @@ import subprocess
 import time
 import re
 import logging
-import signal
 import atexit
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -25,15 +24,8 @@ class TunnelManager:
         self._rate_limit = 5  # Max attempts per IP
         self._rate_limit_window = timedelta(minutes=30)  # Time window for rate limiting
         
-        # Register cleanup on exit
+        # Register cleanup on exit - let Flask handle signals
         atexit.register(self.cleanup)
-        signal.signal(signal.SIGINT, self._signal_handler)
-        signal.signal(signal.SIGTERM, self._signal_handler)
-    
-    def _signal_handler(self, signum, frame):
-        """Handle shutdown signals for clean process termination"""
-        logger.info(f"Received signal {signum}, cleaning up tunnel...")
-        self.cleanup()
     
     def cleanup(self):
         """Clean up tunnel process and resources"""
