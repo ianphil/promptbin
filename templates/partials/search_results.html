@@ -10,7 +10,79 @@
     {% if prompts %}
     <div class="search-results-grid">
         {% for prompt in prompts %}
-        {% include 'partials/prompt_card_htmx.html' %}
+        <div class="prompt-card search-result-card" data-prompt-id="{{ prompt.id }}">
+            <div class="prompt-header">
+                <h3>
+                    {% if prompt._search_highlights and prompt._search_highlights.title_snippet %}
+                        {{ prompt._search_highlights.title_snippet | safe_highlight }}
+                    {% else %}
+                        {{ prompt.title }}
+                    {% endif %}
+                </h3>
+                <span class="category-badge {{ prompt.category }}">{{ prompt.category.title() }}</span>
+            </div>
+            
+            <div class="prompt-preview">
+                {% if prompt._search_highlights %}
+                    {% if prompt._search_highlights.description_snippet %}
+                        <p class="search-snippet">{{ prompt._search_highlights.description_snippet | safe_highlight }}</p>
+                    {% elif prompt._search_highlights.content_snippet %}
+                        <p class="search-snippet">{{ prompt._search_highlights.content_snippet | safe_highlight }}</p>
+                    {% else %}
+                        <p>{{ prompt.description or (prompt.content[:100] + '...' if prompt.content|length > 100 else prompt.content) }}</p>
+                    {% endif %}
+                {% else %}
+                    <p>{{ prompt.description or (prompt.content[:100] + '...' if prompt.content|length > 100 else prompt.content) }}</p>
+                {% endif %}
+            </div>
+            
+            {% if prompt.tags %}
+            <div class="prompt-tags">
+                {% for tag in prompt.tags %}
+                    {% if prompt._search_highlights and tag in prompt._search_highlights.matched_tags %}
+                        <span class="tag highlighted-tag">{{ tag }}</span>
+                    {% else %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if prompt._search_highlights %}
+            <div class="search-match-info">
+                <small class="match-details">
+                    Matches found in:
+                    {% if prompt._search_highlights.title_snippet %} title{% endif %}
+                    {% if prompt._search_highlights.content_snippet %} content{% endif %}
+                    {% if prompt._search_highlights.description_snippet %} description{% endif %}
+                    {% if prompt._search_highlights.matched_tags %} tags{% endif %}
+                </small>
+            </div>
+            {% endif %}
+            
+            <div class="prompt-meta">
+                <span class="created-date">Created: {{ prompt.created_at[:10] }}</span>
+                <div class="prompt-actions">
+                    <a href="{{ url_for('view', prompt_id=prompt.id) }}" 
+                       class="btn-icon" 
+                       title="View"
+                       hx-get="{{ url_for('htmx_view', prompt_id=prompt.id) }}"
+                       hx-push-url="{{ url_for('view', prompt_id=prompt.id) }}"
+                       hx-target=".main-content"
+                       hx-swap="innerHTML">👁️</a>
+                    <a href="{{ url_for('edit', prompt_id=prompt.id) }}" 
+                       class="btn-icon" 
+                       title="Edit"
+                       hx-get="{{ url_for('htmx_edit', prompt_id=prompt.id) }}"
+                       hx-push-url="{{ url_for('edit', prompt_id=prompt.id) }}"
+                       hx-target=".main-content"
+                       hx-swap="innerHTML">✏️</a>
+                    <button class="btn-icon" 
+                            title="Share" 
+                            onclick="sharePrompt('{{ prompt.id }}')">🔗</button>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
     {% else %}
