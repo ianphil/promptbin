@@ -95,7 +95,7 @@ def run_web_only(args):
         '--data-dir', args.data_dir
     ]
     
-    print(f"🌐 Starting PromptBin web interface at http://{args.host}:{args.port}")
+    print(f"[WEB] Starting PromptBin web interface at http://{args.host}:{args.port}")
     app_main()
 
 def run_mcp_only(args):
@@ -108,7 +108,7 @@ def run_mcp_only(args):
     os.environ['PROMPTBIN_DATA_DIR'] = args.data_dir
     os.environ['PROMPTBIN_LOG_LEVEL'] = args.log_level
     
-    print("🤖 Starting PromptBin MCP server...")
+    print("[MCP] Starting PromptBin MCP server...")
     return mcp_main()
 
 def run_both(args):
@@ -121,9 +121,9 @@ def run_both(args):
     os.environ['PROMPTBIN_DATA_DIR'] = args.data_dir
     os.environ['PROMPTBIN_LOG_LEVEL'] = args.log_level
     
-    print("🚀 Starting PromptBin (MCP server + web interface)...")
-    print(f"🤖 MCP server: Ready for AI tool connections")
-    print(f"🌐 Web interface: Will be available at http://{args.host}:{args.port}")
+    print("[START] Starting PromptBin (MCP server + web interface)...")
+    print(f"[MCP] MCP server: Ready for AI tool connections")
+    print(f"[WEB] Web interface: Will be available at http://{args.host}:{args.port}")
     print("💡 Note: Web interface runs as a subprocess when in MCP mode")
     
     return mcp_main()
@@ -155,10 +155,10 @@ def main():
         else:  # both
             return run_both(args)
     except KeyboardInterrupt:
-        print("\n👋 PromptBin stopped")
+        print("\n[STOP] PromptBin stopped")
         return 0
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[ERROR] Error: {e}")
         return 1
 
 if __name__ == '__main__':
