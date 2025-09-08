@@ -2,6 +2,9 @@
 
 **The easiest way to run a Model Context Protocol (MCP) server with full prompt management.**
 
+<img width="1200" height="296" alt="image" src="https://github.com/user-attachments/assets/f4609b53-bac7-4b58-871a-fee1b0f300ce" />
+
+
 ## Setup
 
 ### 1. Install and Configure
