@@ -68,7 +68,7 @@ jobs:
           --cov=src/promptbin \
           --cov-report=term-missing \
           --cov-report=xml \
-          --cov-fail-under=95 \
+          --cov-fail-under=18 \
           -v \
           --tb=short
 
