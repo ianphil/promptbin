@@ -295,7 +295,7 @@ class TestServiceContainer:
         class TestService:
             pass
 
-        with caplog.at_level(logging.DEBUG, logger="core.container.ServiceContainer"):
+        with caplog.at_level(logging.DEBUG):
             # Register and resolve service
             self.container.register_singleton(TestService, lambda c: TestService())
             self.container.resolve(TestService)
