@@ -76,7 +76,7 @@ Examples:
     parser.add_argument(
         '--version', 
         action='version', 
-        version='PromptBin 0.3.0'
+        version='PromptBin 0.3.2'
     )
     
     return parser
