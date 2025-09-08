@@ -48,14 +48,11 @@ class FlaskManager:
             return
 
         self.port = find_available_port(self.base_port)
-        # Get the directory where app.py is located (parent of utils)
-        utils_dir = os.path.dirname(os.path.abspath(__file__))
-        promptbin_dir = os.path.dirname(utils_dir)
-        app_path = os.path.join(promptbin_dir, "app.py")
-        
+        # Run app.py as a module to handle relative imports properly
         cmd = [
             sys.executable,
-            app_path,
+            "-m",
+            "promptbin.app",
             "--mode",
             "mcp-managed",
             "--host",
