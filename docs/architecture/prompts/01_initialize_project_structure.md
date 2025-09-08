@@ -2,7 +2,7 @@
 
 Create the initial project structure for PromptBin, a local-first prompt management tool. Set up:
 1. A Python project with Flask as the web framework
-2. File-based storage structure in a prompts/ directory with subdirectories for coding/, writing/, and analysis/
+2. File-based storage structure in ~/promptbin-data/ directory with subdirectories for coding/, writing/, and analysis/
 3. Basic Flask app.py with routes for index, create, view, edit operations
 4. Templates directory with base.html using HTMX
 5. A requirements.txt with Flask, and other necessary dependencies

@@ -10,7 +10,7 @@ import pytest
 from statistics import mean, stdev
 from typing import List
 
-from core.container import ServiceContainer
+from promptbin.core.container import ServiceContainer
 
 
 class TestPerformance:

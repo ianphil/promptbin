@@ -48,9 +48,10 @@ class FlaskManager:
             return
 
         self.port = find_available_port(self.base_port)
-        # Get the directory where this script is located
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        app_path = os.path.join(script_dir, "app.py")
+        # Get the directory where app.py is located (parent of utils)
+        utils_dir = os.path.dirname(os.path.abspath(__file__))
+        promptbin_dir = os.path.dirname(utils_dir)
+        app_path = os.path.join(promptbin_dir, "app.py")
         
         cmd = [
             sys.executable,

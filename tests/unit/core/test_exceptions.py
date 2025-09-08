@@ -6,8 +6,8 @@ Tests focus on error scenarios, exception handling, and error message quality.
 
 import pytest
 
-from core.container import ServiceContainer
-from core.exceptions import (
+from promptbin.core.container import ServiceContainer
+from promptbin.core.exceptions import (
     ServiceResolutionError,
     CircularDependencyError,
     ServiceRegistrationError,

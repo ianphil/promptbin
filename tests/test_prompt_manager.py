@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from prompt_manager import PromptManager
+from promptbin.managers.prompt_manager import PromptManager
 
 
 def make_pm(tmp_path, monkeypatch) -> PromptManager:

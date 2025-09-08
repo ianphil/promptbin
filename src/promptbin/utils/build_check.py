@@ -75,17 +75,13 @@ def main():
             print("❌ promptbin entry point failed")
             return 1
             
-        if not run_command("promptbin-mcp --help"):
-            print("❌ promptbin-mcp entry point failed")
-            return 1
-            
         if not run_command("promptbin-setup --help"):
             print("❌ promptbin-setup entry point failed")
             return 1
     
     print("\n🎉 All validation checks passed!")
     print("\nNext steps:")
-    print("1. Test manually: uv run promptbin-mcp")
+    print("1. Test manually: uv run promptbin")
     print("2. Publish to PyPI: uv publish")
     print("3. Test installation: uv add promptbin")
     
