@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PromptBin is the easiest way to run a Model Context Protocol (MCP) server with full prompt management capabilities. It's designed as a reference implementation and example for MCP server integration.
 
-**Primary use case**: `uv add promptbin && uv run promptbin-mcp`
+**Primary use case**: `uvx promptbin` (no installation needed!)
 
 **Modes**:
 - **MCP Server Mode** (primary): Full MCP protocol + auto-launching web interface
@@ -14,22 +14,27 @@ PromptBin is the easiest way to run a Model Context Protocol (MCP) server with f
 
 ## Development Commands
 
-**For PyPI distribution (recommended)**:
+**Quick Start (no installation needed)**:
+```bash
+# Run PromptBin directly with uvx
+uvx promptbin
+
+# Run with specific version
+uvx promptbin@0.3.0
+
+# Run with latest version
+uvx promptbin@latest
+```
+
+**Traditional Installation**:
 ```bash
 # Install from PyPI
+pip install promptbin
+promptbin
+
+# Or with uv
 uv add promptbin
-
-# Run MCP server (primary use case)
-uv run promptbin-mcp
-
-# Run standalone web interface
 uv run promptbin
-
-# Setup verification
-uv run promptbin-setup
-
-# Install Dev Tunnels CLI
-uv run promptbin-install-tunnel
 ```
 
 **For development**:

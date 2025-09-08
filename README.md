@@ -55,20 +55,38 @@ That's it! PromptBin is now running:
 
 ```bash
 # Default: Run both MCP server and web interface
-promptbin
+uvx promptbin
 
 # Run only MCP server (for AI tools)
-promptbin --mcp
+uvx promptbin --mcp
 
 # Run only web interface (standalone)
-promptbin --web
+uvx promptbin --web
 
 # Custom port and options
-promptbin --port 8080 --data-dir ~/my-prompts
+uvx promptbin --port 8080 --data-dir ~/my-prompts
+
+# Use specific version
+uvx promptbin@0.3.0
+
+# Always use latest
+uvx promptbin@latest
 ```
 
-### Development Mode
-For development or customization:
+### Alternative Installation Methods
+
+#### Traditional Installation
+```bash
+# Install globally with pip
+pip install promptbin
+promptbin
+
+# Or install in project with uv
+uv add promptbin
+uv run promptbin
+```
+
+#### Development Mode
 ```bash
 git clone https://github.com/ianphil/promptbin
 cd promptbin
