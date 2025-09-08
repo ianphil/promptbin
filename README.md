@@ -2,40 +2,43 @@
 
 **The easiest way to run a Model Context Protocol (MCP) server with full prompt management.**
 
-## Quick Start
+## Setup
+
+### 1. Install and Configure
 
 ```bash
-# Install from PyPI
-uv add promptbin
+# Install PromptBin
+pip install promptbin
 
-# Run PromptBin (MCP server + web interface)
-uv run promptbin
+# Install Dev Tunnels CLI (optional, for public sharing)
+promptbin-install-tunnel
+
+# Authenticate with Dev Tunnels (optional, one-time setup)
+devtunnel user login -g
+
+# Verify setup
+promptbin-setup
 ```
 
-That's it! PromptBin is now running with both MCP server and web interface at `http://localhost:5001`.
+### 2. Add to Your AI Client
 
-## Add to AI Tools
-
-### Claude Desktop (Mac/Windows)
-Open Settings → Developer → Edit Config and add:
-
+**Claude Desktop** - Add to Settings → Developer → Edit Config:
 ```json
 {
   "mcpServers": {
     "promptbin": {
+      "type": "stdio",
       "command": "promptbin"
     }
   }
 }
 ```
 
-### ChatGPT Desktop (Mac/Windows)
-- Open Settings → Developer → Model Context Protocol
-- Click "Add Server"
-- Name: `promptbin`
-- Command: `promptbin`
+### 3. Start Using
 
-*Note: These configs assume global installation with `pip install promptbin`. For development, use `uv run promptbin`.*
+That's it! PromptBin is now running:
+- **Web UI**: `http://localhost:5001` - Manage and create prompts
+- **MCP Server**: Ready for AI tool connections
 
 ## Key Features
 - **🚀 Easy setup**: One command to get started
