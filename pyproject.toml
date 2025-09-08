@@ -1,6 +1,6 @@
 [project]
 name = "promptbin"
-version = "0.3.2"
+version = "0.3.3"
 description = "Easy-to-use MCP server for prompt management with web interface and secure sharing"
 readme = "README.md"
 requires-python = ">=3.11"
