@@ -3,7 +3,7 @@
 ## Phase 1: Core DI Infrastructure (High Priority)
 
 ### 1.1 Create Service Container
-- **Create `core/container.py`**: Lightweight DI container with service registration and resolution
+- **Create `src/promptbin/core/container.py`**: Lightweight DI container with service registration and resolution
 - **Features**: Singleton/transient lifecycle management, circular dependency detection, interface-based registration
 
 **Testing Plan:**
@@ -14,7 +14,7 @@
 - Performance tests for service resolution
 
 ### 1.2 Configuration Management  
-- **Create `core/config.py`**: Centralized configuration class that consolidates all environment variables
+- **Create `src/promptbin/core/config.py`**: Centralized configuration class that consolidates all environment variables
 - **Replace scattered `os.environ.get()` calls** with config injection
 - **Add validation and defaults** for all configuration options
 
@@ -52,7 +52,7 @@
 - Error handling tests for invalid configurations
 
 ### 2.2 Flask App Refactoring
-- **Remove global variables**: Replace global managers in `app.py:25-43` with dependency injection
+- **Remove global variables**: Replace global managers in `src/promptbin/app.py:25-43` with dependency injection
 - **Create app factory**: `create_app(container)` function that receives configured services
 - **Update route handlers**: Access services through dependency injection instead of globals
 
@@ -78,7 +78,7 @@
 ## Phase 3: Integration and Testing (High Priority)
 
 ### 3.1 CLI Integration
-- **Update `cli.py`**: Configure container based on command line arguments
+- **Update `src/promptbin/cli.py`**: Configure container based on command line arguments
 - **Service registration**: Register all services with appropriate lifecycles  
 - **Mode handling**: Different service configurations for standalone vs MCP modes
 
@@ -146,21 +146,21 @@
 ## Files to Create/Modify
 
 **New Files:**
-- `core/container.py` (DI container implementation)
-- `core/config.py` (centralized configuration)
-- `core/interfaces/__init__.py` (service interfaces)
+- `src/promptbin/core/container.py` (DI container implementation)
+- `src/promptbin/core/config.py` (centralized configuration)
+- `src/promptbin/core/interfaces/__init__.py` (service interfaces)
 - `tests/unit/core/test_container.py`
 - `tests/unit/core/test_config.py`
 - `tests/unit/services/test_*_manager.py`
 - `tests/integration/test_service_integration.py`
 
 **Modified Files:**  
-- `app.py` (remove globals, add app factory)
-- `mcp_server.py` (use container for dependencies)
-- `prompt_manager.py` (accept config injection)
-- `share_manager.py` (accept config injection)  
-- `tunnel_manager.py` (accept config injection)
-- `flask_manager.py` (accept config injection)
-- `cli.py` (configure and use container)
+- `src/promptbin/app.py` (remove globals, add app factory)
+- `src/promptbin/mcp/server.py` (use container for dependencies)
+- `src/promptbin/managers/prompt_manager.py` (accept config injection)
+- `src/promptbin/managers/share_manager.py` (accept config injection)  
+- `src/promptbin/managers/tunnel_manager.py` (accept config injection)
+- `src/promptbin/utils/flask_manager.py` (accept config injection)
+- `src/promptbin/cli.py` (configure and use container)
 
 This plan maintains existing functionality while establishing a solid foundation for future architectural improvements, with comprehensive testing at every level.

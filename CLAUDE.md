@@ -6,11 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PromptBin is the easiest way to run a Model Context Protocol (MCP) server with full prompt management capabilities. It's designed as a reference implementation and example for MCP server integration.
 
-**Primary use case**: `uv add promptbin && uv run promptbin-mcp`
+**Primary use case**: `uv add promptbin && uv run promptbin`
 
 **Modes**:
-- **MCP Server Mode** (primary): Full MCP protocol + auto-launching web interface
-- **Standalone Mode** (secondary): Web interface only
+- **Both Mode** (default): MCP server + auto-launching web interface
+- **MCP Server Mode**: MCP protocol only with `--mcp` flag
+- **Web Mode**: Web interface only with `--web` flag
 
 ## Development Commands
 
@@ -19,11 +20,14 @@ PromptBin is the easiest way to run a Model Context Protocol (MCP) server with f
 # Install from PyPI
 uv add promptbin
 
-# Run MCP server (primary use case)
-uv run promptbin-mcp
-
-# Run standalone web interface
+# Run both MCP server + web interface (primary use case)
 uv run promptbin
+
+# Run only MCP server
+uv run promptbin --mcp
+
+# Run only web interface
+uv run promptbin --web
 
 # Setup verification
 uv run promptbin-setup
@@ -38,7 +42,7 @@ uv run promptbin-install-tunnel
 git clone https://github.com/ianphil/promptbin
 cd promptbin
 uv sync
-uv run promptbin-mcp
+uv run promptbin
 ```
 
 ## Architecture Overview
@@ -54,7 +58,8 @@ uv run promptbin-mcp
 ~/promptbin-data/
 ├── coding/     # Development-related prompts
 ├── writing/    # Content creation prompts  
-└── analysis/   # Data analysis prompts
+├── analysis/   # Data analysis prompts
+└── shares.json # Share token management
 ```
 
 ### Key Design Principles
@@ -103,13 +108,13 @@ Project is fully implemented with comprehensive features:
 - ✅ **Documentation & Setup**: Comprehensive guides and automation scripts
 
 ### Key Components
-- `app.py`: Complete Flask web application with all routes and features
-- `mcp_server.py`: Full MCP server implementation with subprocess management
-- `prompt_manager.py`: File-based storage with search, categories, and metadata
-- `share_manager.py`: Secure sharing with ephemeral tokens
-- `tunnel_manager.py`: Microsoft Dev Tunnels integration with rate limiting
-- `setup_checker.py`: System validation and diagnostic tool
-- `scripts/install_devtunnel.py`: Cross-platform installer automation
+- `src/promptbin/app.py`: Complete Flask web application with all routes and features
+- `src/promptbin/mcp/server.py`: Full MCP server implementation with subprocess management
+- `src/promptbin/managers/prompt_manager.py`: File-based storage with search, categories, and metadata
+- `src/promptbin/managers/share_manager.py`: Secure sharing with ephemeral tokens
+- `src/promptbin/managers/tunnel_manager.py`: Microsoft Dev Tunnels integration with rate limiting
+- `src/promptbin/utils/setup_checker.py`: System validation and diagnostic tool
+- `src/promptbin/utils/install_devtunnel.py`: Cross-platform installer automation
 - `TUNNELS.md`: Comprehensive technical documentation
 
 ### Environment Configuration

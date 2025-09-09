@@ -48,7 +48,9 @@ class ServiceRegistration:
             raise
         except Exception as e:
             raise ServiceRegistrationError(
-                self.service_type, "Factory function failed during service creation", e
+                self.service_type,
+                "Factory function failed during service creation",
+                e,
             )
 
 

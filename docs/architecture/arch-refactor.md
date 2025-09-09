@@ -7,11 +7,11 @@ This architectural review identified PromptBin as a functionally complete refere
 ## Current Architecture Analysis
 
 ### Core Components Reviewed
-- **app.py** - Flask web application (monolithic structure)
-- **mcp_server.py** - MCP protocol server with process management
-- **prompt_manager.py** - File-based storage system
-- **share_manager.py** - Sharing functionality with ephemeral tokens
-- **tunnel_manager.py** - Dev Tunnels integration with rate limiting
+- **src/promptbin/app.py** - Flask web application (monolithic structure)
+- **src/promptbin/mcp/server.py** - MCP protocol server with process management
+- **src/promptbin/managers/prompt_manager.py** - File-based storage system
+- **src/promptbin/managers/share_manager.py** - Sharing functionality with ephemeral tokens
+- **src/promptbin/managers/tunnel_manager.py** - Dev Tunnels integration with rate limiting
 
 ### Identified Architectural Issues
 
@@ -90,7 +90,7 @@ This architectural review identified PromptBin as a functionally complete refere
 ## Proposed Architecture Structure
 
 ```
-promptbin/
+src/promptbin/
 ├── core/
 │   ├── config/           # Configuration management
 │   ├── services/         # Business logic services

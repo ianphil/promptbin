@@ -15,7 +15,7 @@ PromptBin is a local-first prompt management and sharing tool designed for AI pr
 
 #### Mode 1: MCP-Managed (Primary Mode)
 **Startup Sequence:**
-1. MCP server (`mcp_server.py`) is loaded by AI tool (Claude, etc.)
+1. MCP server (`src/promptbin/mcp/server.py`) is loaded by AI tool (Claude, etc.)
 2. MCP server automatically launches Flask web interface on `localhost:5000`
 3. Both MCP protocol endpoints and web UI become available simultaneously
 4. User can access prompt management via browser while AI tools access via MCP
@@ -34,7 +34,7 @@ PromptBin is a local-first prompt management and sharing tool designed for AI pr
 #### Mode 2: Standalone Web Interface
 **Startup:**
 ```bash
-python app.py
+python src/promptbin/app.py
 ```
 - Flask app starts independently on `localhost:5000`
 - No MCP server running
@@ -92,20 +92,26 @@ python app.py
 ### File Structure
 ```
 promptbin/
-├── app.py                    # Flask web application
-├── mcp_server.py            # MCP server component
-├── prompts/                 # File-based prompt storage
-│   ├── coding/
-│   ├── writing/
-│   └── analysis/
-├── templates/
-│   ├── base.html           # HTMX scripts + layout
-│   ├── index.html          # Browse/search prompts
-│   ├── create.html         # New prompt form
-│   ├── view.html           # View single prompt
-│   ├── edit.html           # Edit existing prompt
-│   └── partials/           # HTMX fragments
-└── static/css/style.css
+├── src/promptbin/
+│   ├── app.py              # Flask web application
+│   ├── mcp/
+│   │   └── server.py       # MCP server component
+│   ├── managers/           # Storage and sharing managers
+│   ├── utils/              # Utility functions
+│   └── web/                # Templates and static assets
+│       ├── templates/
+│       │   ├── base.html   # HTMX scripts + layout
+│       │   ├── index.html  # Browse/search prompts
+│       │   ├── create.html # New prompt form
+│       │   ├── view.html   # View single prompt
+│       │   ├── edit.html   # Edit existing prompt
+│       │   └── partials/   # HTMX fragments
+│       └── static/css/style.css
+└── ~/promptbin-data/       # File-based prompt storage (user home directory)
+    ├── coding/
+    ├── writing/
+    ├── analysis/
+    └── shares.json
 ```
 
 ## User Workflows

@@ -6,7 +6,7 @@
 ```
 Create the initial project structure for PromptBin, a local-first prompt management tool. Set up:
 1. A Python project with Flask as the web framework
-2. File-based storage structure in a prompts/ directory with subdirectories for coding/, writing/, and analysis/
+2. File-based storage structure in ~/promptbin-data/ directory with subdirectories for coding/, writing/, and analysis/
 3. Basic Flask app.py with routes for index, create, view, edit operations
 4. Templates directory with base.html using HTMX
 5. A requirements.txt with Flask, and other necessary dependencies
@@ -18,14 +18,14 @@ The app should run on localhost:5000 and use HTMX for dynamic interactions witho
 ### Prompt 2: Implement File-Based Storage System
 ```
 Implement a file-based storage system for PromptBin that:
-1. Stores prompts as JSON files in the prompts/ directory structure
+1. Stores prompts as JSON files in the ~/promptbin-data/ directory structure
 2. Each prompt file contains: id, title, content, category, description, tags, created_at, updated_at
 3. Creates a PromptManager class with methods: save_prompt(), get_prompt(), list_prompts(), delete_prompt(), search_prompts()
 4. Handles file operations with proper error handling
 5. Generates unique IDs for prompts using timestamps and random strings
 6. Supports moving prompts between categories
 
-Store files as: prompts/{category}/{prompt_id}.json
+Store files as: ~/promptbin-data/{category}/{prompt_id}.json
 ```
 
 ## Web Interface Development

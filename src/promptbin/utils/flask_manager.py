@@ -20,9 +20,11 @@ def find_available_port(start_port: int = 5000, max_tries: int = 50) -> int:
                 return port
             except OSError:
                 port += 1
-    
+
     # Raise exception instead of returning potentially occupied port
-    raise RuntimeError(f"No available ports found in range {start_port}-{start_port + max_tries - 1}")
+    raise RuntimeError(
+        f"No available ports found in range {start_port}-{start_port + max_tries - 1}"
+    )
 
 
 @dataclass
@@ -38,7 +40,9 @@ class FlaskManager:
 
     process: Optional[asyncio.subprocess.Process] = field(default=None, init=False)
     port: Optional[int] = field(default=None, init=False)
-    _logger: logging.Logger = field(default_factory=lambda: logging.getLogger(__name__), init=False)
+    _logger: logging.Logger = field(
+        default_factory=lambda: logging.getLogger(__name__), init=False
+    )
     _restart_count: int = field(default=0, init=False)
     _monitor_task: Optional[asyncio.Task] = field(default=None, init=False)
 
@@ -48,13 +52,11 @@ class FlaskManager:
             return
 
         self.port = find_available_port(self.base_port)
-        # Get the directory where this script is located
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        app_path = os.path.join(script_dir, "app.py")
-        
+        # Run app.py as a module to handle relative imports properly
         cmd = [
             sys.executable,
-            app_path,
+            "-m",
+            "promptbin.app",
             "--mode",
             "mcp-managed",
             "--host",
@@ -68,29 +70,27 @@ class FlaskManager:
         ]
 
         self._logger.info(f"Starting Flask on {self.host}:{self.port} ...")
-        
+
         if self.debug_mode:
             # In debug mode, capture output to log files
-            log_dir = os.path.join(self.data_dir, 'logs')
+            log_dir = os.path.join(self.data_dir, "logs")
             os.makedirs(log_dir, exist_ok=True)
-            stdout_file = open(os.path.join(log_dir, 'flask_stdout.log'), 'w')
-            stderr_file = open(os.path.join(log_dir, 'flask_stderr.log'), 'w')
-            
+            stdout_file = open(os.path.join(log_dir, "flask_stdout.log"), "w")
+            stderr_file = open(os.path.join(log_dir, "flask_stderr.log"), "w")
+
             self.process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=stdout_file,
-                stderr=stderr_file
+                *cmd, stdout=stdout_file, stderr=stderr_file
             )
         else:
             self.process = await asyncio.create_subprocess_exec(
-                *cmd, 
+                *cmd,
                 stdout=asyncio.subprocess.DEVNULL,
-                stderr=asyncio.subprocess.DEVNULL
+                stderr=asyncio.subprocess.DEVNULL,
             )
 
         # Give Flask more time to start up before health checking
         await asyncio.sleep(5)
-        
+
         # Wait for health
         ready = await self._wait_until_healthy(timeout=30)
         if not ready:
@@ -107,7 +107,9 @@ class FlaskManager:
             self._logger.info("Stopping Flask process ...")
             self.process.terminate()
             try:
-                await asyncio.wait_for(self.process.wait(), timeout=self.shutdown_timeout)
+                await asyncio.wait_for(
+                    self.process.wait(), timeout=self.shutdown_timeout
+                )
             except asyncio.TimeoutError:
                 self._logger.warning("Flask did not exit on SIGTERM; killing...")
                 self.process.kill()
@@ -120,7 +122,7 @@ class FlaskManager:
 
     async def restart_flask(self) -> None:
         await self.stop_flask()
-        backoff = min(2 ** self._restart_count, 30)
+        backoff = min(2**self._restart_count, 30)
         if self._restart_count:
             await asyncio.sleep(backoff)
         await self.start_flask()
@@ -157,7 +159,9 @@ class FlaskManager:
             json_data = resp.json() if resp.ok else {}
             is_healthy = resp.ok and json_data.get("status") == "healthy"
             if not is_healthy:
-                self._logger.warning(f"Health check failed: status={resp.status_code}, data={json_data}")
+                self._logger.warning(
+                    f"Health check failed: status={resp.status_code}, data={json_data}"
+                )
             return is_healthy
         except Exception as e:
             self._logger.warning(f"Health check exception: {e}")
@@ -181,4 +185,3 @@ class FlaskManager:
     def _cleanup_process_refs(self):
         self.process = None
         self.port = None
-

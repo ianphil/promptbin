@@ -9,8 +9,8 @@ import pytest
 from unittest.mock import Mock, MagicMock
 import logging
 
-from core.container import ServiceContainer, ServiceLifetime
-from core.exceptions import (
+from promptbin.core.container import ServiceContainer, ServiceLifetime
+from promptbin.core.exceptions import (
     ServiceResolutionError,
     CircularDependencyError,
     ServiceRegistrationError,
@@ -295,7 +295,7 @@ class TestServiceContainer:
         class TestService:
             pass
 
-        with caplog.at_level(logging.DEBUG, logger="core.container.ServiceContainer"):
+        with caplog.at_level(logging.DEBUG):
             # Register and resolve service
             self.container.register_singleton(TestService, lambda c: TestService())
             self.container.resolve(TestService)
@@ -316,7 +316,7 @@ class TestServiceRegistration:
 
     def test_service_registration_creation(self):
         """Test ServiceRegistration object creation."""
-        from core.container import ServiceRegistration
+        from promptbin.core.container import ServiceRegistration
 
         class TestService:
             pass
@@ -332,7 +332,7 @@ class TestServiceRegistration:
 
     def test_service_registration_create_instance(self):
         """Test ServiceRegistration instance creation."""
-        from core.container import ServiceRegistration
+        from promptbin.core.container import ServiceRegistration
 
         class TestService:
             def __init__(self, value):
@@ -351,7 +351,7 @@ class TestServiceRegistration:
 
     def test_service_registration_factory_error(self):
         """Test ServiceRegistration error handling for factory failures."""
-        from core.container import ServiceRegistration
+        from promptbin.core.container import ServiceRegistration
 
         class TestService:
             pass

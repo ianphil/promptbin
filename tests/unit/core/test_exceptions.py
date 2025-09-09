@@ -6,8 +6,8 @@ Tests focus on error scenarios, exception handling, and error message quality.
 
 import pytest
 
-from core.container import ServiceContainer
-from core.exceptions import (
+from promptbin.core.container import ServiceContainer
+from promptbin.core.exceptions import (
     ServiceResolutionError,
     CircularDependencyError,
     ServiceRegistrationError,
@@ -142,10 +142,12 @@ class TestErrorHandling:
         # Register services with nested dependencies
         self.container.register_singleton(DatabaseService, lambda c: DatabaseService())
         self.container.register_singleton(
-            RepositoryService, lambda c: RepositoryService(c.resolve(DatabaseService))
+            RepositoryService,
+            lambda c: RepositoryService(c.resolve(DatabaseService)),
         )
         self.container.register_singleton(
-            BusinessService, lambda c: BusinessService(c.resolve(RepositoryService))
+            BusinessService,
+            lambda c: BusinessService(c.resolve(RepositoryService)),
         )
 
         # Should fail when trying to resolve top-level service
