@@ -39,18 +39,22 @@ def test_save_and_get_prompt(tmp_path, monkeypatch):
 def test_list_and_delete_prompt(tmp_path, monkeypatch):
     pm = make_pm(tmp_path, monkeypatch)
 
-    id1 = pm.save_prompt({
-        "title": "One",
-        "content": "foo",
-        "category": "coding",
-        "tags": "t1",
-    })
-    id2 = pm.save_prompt({
-        "title": "Two",
-        "content": "bar",
-        "category": "writing",
-        "tags": "t2",
-    })
+    id1 = pm.save_prompt(
+        {
+            "title": "One",
+            "content": "foo",
+            "category": "coding",
+            "tags": "t1",
+        }
+    )
+    id2 = pm.save_prompt(
+        {
+            "title": "Two",
+            "content": "bar",
+            "category": "writing",
+            "tags": "t2",
+        }
+    )
 
     all_prompts = pm.list_prompts()
     assert {p["id"] for p in all_prompts} >= {id1, id2}
@@ -65,18 +69,22 @@ def test_list_and_delete_prompt(tmp_path, monkeypatch):
 def test_search_prompts(tmp_path, monkeypatch):
     pm = make_pm(tmp_path, monkeypatch)
 
-    pm.save_prompt({
-        "title": "Searchable",
-        "content": "This content has a unique needle",
-        "category": "analysis",
-        "tags": "search,example",
-    })
-    pm.save_prompt({
-        "title": "Other",
-        "content": "Nothing to see here",
-        "category": "coding",
-        "tags": "misc",
-    })
+    pm.save_prompt(
+        {
+            "title": "Searchable",
+            "content": "This content has a unique needle",
+            "category": "analysis",
+            "tags": "search,example",
+        }
+    )
+    pm.save_prompt(
+        {
+            "title": "Other",
+            "content": "Nothing to see here",
+            "category": "coding",
+            "tags": "misc",
+        }
+    )
 
     results = pm.search_prompts("needle")
     assert len(results) == 1
@@ -85,4 +93,3 @@ def test_search_prompts(tmp_path, monkeypatch):
     # Empty query returns full listing
     all_results = pm.search_prompts("")
     assert len(all_results) == len(pm.list_prompts())
-

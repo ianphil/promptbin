@@ -7,7 +7,7 @@ from .build_check import main as build_check_main
 
 __all__ = [
     "setup_main",
-    "install_tunnel_main", 
+    "install_tunnel_main",
     "FlaskManager",
     "build_check_main",
 ]

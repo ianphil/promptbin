@@ -17,7 +17,7 @@ from .core.exceptions import (
     ServiceRegistrationError,
 )
 
-# Manager exports  
+# Manager exports
 from .managers.prompt_manager import PromptManager
 from .managers.share_manager import ShareManager
 from .managers.tunnel_manager import TunnelManager
@@ -29,6 +29,6 @@ __all__ = [
     "CircularDependencyError",
     "ServiceRegistrationError",
     "PromptManager",
-    "ShareManager", 
+    "ShareManager",
     "TunnelManager",
 ]
