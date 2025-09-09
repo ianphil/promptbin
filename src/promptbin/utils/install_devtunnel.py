@@ -47,11 +47,20 @@ class DevTunnelInstaller:
         arch = self._get_architecture()
 
         if self.system == "linux":
-            return (f"https://aka.ms/TunnelsCliDownload/linux-{arch}", "devtunnel")
+            return (
+                f"https://aka.ms/TunnelsCliDownload/linux-{arch}",
+                "devtunnel",
+            )
         elif self.system == "darwin":  # macOS
-            return (f"https://aka.ms/TunnelsCliDownload/osx-{arch}", "devtunnel")
+            return (
+                f"https://aka.ms/TunnelsCliDownload/osx-{arch}",
+                "devtunnel",
+            )
         elif self.system == "windows":
-            return (f"https://aka.ms/TunnelsCliDownload/win-{arch}", "devtunnel.exe")
+            return (
+                f"https://aka.ms/TunnelsCliDownload/win-{arch}",
+                "devtunnel.exe",
+            )
         else:
             raise ValueError(f"Unsupported platform: {self.system}")
 
@@ -59,7 +68,10 @@ class DevTunnelInstaller:
         """Check if devtunnel is already installed"""
         try:
             result = subprocess.run(
-                ["devtunnel", "--version"], capture_output=True, text=True, timeout=10
+                ["devtunnel", "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0:
                 version_info = result.stdout.strip()
@@ -88,7 +100,8 @@ class DevTunnelInstaller:
                 if result.returncode == 0:
                     print("Installing via winget...")
                     result = subprocess.run(
-                        ["winget", "install", "Microsoft.devtunnel"], check=True
+                        ["winget", "install", "Microsoft.devtunnel"],
+                        check=True,
                     )
                     return True
         except (FileNotFoundError, subprocess.CalledProcessError):
@@ -175,7 +188,7 @@ class DevTunnelInstaller:
                     Path.home() / ".profile",
                 ]
 
-                path_export = f'export PATH="$HOME/.local/bin:$PATH"'
+                path_export = 'export PATH="$HOME/.local/bin:$PATH"'
 
                 for config_file in shell_configs:
                     if config_file.exists():
@@ -184,14 +197,15 @@ class DevTunnelInstaller:
                             if path_export not in content:
                                 with config_file.open("a") as f:
                                     f.write(
-                                        f"\n# Added by PromptBin DevTunnel installer\n{path_export}\n"
+                                        f"\n# Added by PromptBin DevTunnel "
+                                        f"installer\n{path_export}\n"
                                     )
                                 print(f"Added PATH export to {config_file}")
                                 break
                         except Exception:
                             continue
 
-                print(f"Run: source ~/.bashrc (or restart terminal)")
+                print("Run: source ~/.bashrc (or restart terminal)")
 
     def _verify_installation(self) -> bool:
         """Verify that the installation was successful"""
@@ -201,7 +215,7 @@ class DevTunnelInstaller:
         for attempt in range(3):
             installed, version_info = self._check_existing_installation()
             if installed:
-                print(f"✅ DevTunnel CLI installed successfully!")
+                print("✅ DevTunnel CLI installed successfully!")
                 print(f"Version: {version_info}")
                 return True
             elif attempt < 2:  # Don't sleep on last attempt
@@ -242,7 +256,8 @@ class DevTunnelInstaller:
             print("❌ Installation failed!")
             print("\nManual installation options:")
             print(
-                "- Linux: curl -sL https://aka.ms/TunnelsCliDownload/linux-x64 -o devtunnel"
+                "- Linux: curl -sL "
+                "https://aka.ms/TunnelsCliDownload/linux-x64 -o devtunnel"
             )
             print("- macOS: brew install --cask devtunnel")
             print("- Windows: winget install Microsoft.devtunnel")

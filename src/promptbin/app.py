@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, jsonify
 import os
 import re
 import time
@@ -123,7 +123,8 @@ def htmx_view(prompt_id):
     prompt = prompt_manager.get_prompt(prompt_id)
     if not prompt:
         return (
-            '<div class="error-container"><div class="error-content"><h1>Prompt not found</h1></div></div>',
+            '<div class="error-container"><div class="error-content">'
+            "<h1>Prompt not found</h1></div></div>",
             404,
         )
     return render_template("partials/view_content.html", prompt=prompt)
@@ -135,7 +136,8 @@ def htmx_edit(prompt_id):
     prompt = prompt_manager.get_prompt(prompt_id)
     if not prompt:
         return (
-            '<div class="error-container"><div class="error-content"><h1>Prompt not found</h1></div></div>',
+            '<div class="error-container"><div class="error-content">'
+            "<h1>Prompt not found</h1></div></div>",
             404,
         )
     return render_template("partials/edit_content.html", prompt=prompt)
@@ -230,7 +232,10 @@ def create_prompt():
     try:
         data = request.get_json()
         if not data:
-            return jsonify({"status": "error", "message": "No data provided"}), 400
+            return (
+                jsonify({"status": "error", "message": "No data provided"}),
+                400,
+            )
 
         prompt_id = prompt_manager.save_prompt(data)
         return jsonify(
@@ -242,8 +247,11 @@ def create_prompt():
         )
     except ValueError as e:
         return jsonify({"status": "error", "message": str(e)}), 400
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+    except Exception:
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/api/prompts/<prompt_id>", methods=["PUT"])
@@ -252,18 +260,27 @@ def update_prompt(prompt_id):
     try:
         data = request.get_json()
         if not data:
-            return jsonify({"status": "error", "message": "No data provided"}), 400
+            return (
+                jsonify({"status": "error", "message": "No data provided"}),
+                400,
+            )
 
         # Check if prompt exists
         if not prompt_manager.get_prompt(prompt_id):
-            return jsonify({"status": "error", "message": "Prompt not found"}), 404
+            return (
+                jsonify({"status": "error", "message": "Prompt not found"}),
+                404,
+            )
 
         prompt_manager.save_prompt(data, prompt_id)
         return jsonify({"status": "success", "message": "Prompt updated successfully"})
     except ValueError as e:
         return jsonify({"status": "error", "message": str(e)}), 400
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+    except Exception:
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/api/prompts/<prompt_id>", methods=["DELETE"])
@@ -275,9 +292,15 @@ def delete_prompt(prompt_id):
                 {"status": "success", "message": "Prompt deleted successfully"}
             )
         else:
-            return jsonify({"status": "error", "message": "Prompt not found"}), 404
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+            return (
+                jsonify({"status": "error", "message": "Prompt not found"}),
+                404,
+            )
+    except Exception:
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/api/search")
@@ -295,7 +318,7 @@ def search_prompts():
             query=query,
             count=len(prompts),
         )
-    except Exception as e:
+    except Exception:
         return '<div class="error">Search failed</div>', 500
 
 
@@ -309,13 +332,14 @@ def search_prompts_json():
         prompts = prompt_manager.search_prompts(query, category)
 
         return jsonify({"prompts": prompts, "query": query, "count": len(prompts)})
-    except Exception as e:
+    except Exception:
         return jsonify({"status": "error", "message": "Search failed"}), 500
 
 
 @app.route("/api/preview", methods=["POST"])
 def preview_content():
-    """API endpoint to preview prompt content with syntax highlighting - handles both JSON and form data"""
+    """API endpoint to preview prompt content with syntax highlighting
+    - handles both JSON and form data"""
     try:
         # Handle both JSON (for fetch requests) and form data (for HTMX)
         if request.is_json:
@@ -337,11 +361,21 @@ def preview_content():
                 return jsonify(
                     {
                         "status": "success",
-                        "html": '<div class="preview-placeholder"><div class="placeholder-icon">👁️</div><p>Start typing to see a live preview...</p></div>',
+                        "html": (
+                            '<div class="preview-placeholder">'
+                            '<div class="placeholder-icon">👁️</div>'
+                            "<p>Start typing to see a live preview...</p>"
+                            "</div>"
+                        ),
                     }
                 )
             else:
-                return '<div class="preview-placeholder"><div class="placeholder-icon">👁️</div><p>Start typing to see a live preview...</p></div>'
+                return (
+                    '<div class="preview-placeholder">'
+                    '<div class="placeholder-icon">👁️</div>'
+                    "<p>Start typing to see a live preview...</p>"
+                    "</div>"
+                )
 
         # Convert markdown to HTML
         html_content = markdown.markdown(
@@ -363,14 +397,17 @@ def preview_content():
             # Return HTML directly for HTMX
             return html_content
 
-    except Exception as e:
+    except Exception:
         if return_json:
             return (
                 jsonify({"status": "error", "message": "Preview generation failed"}),
                 500,
             )
         else:
-            return '<div class="preview-error">Preview generation failed</div>', 500
+            return (
+                '<div class="preview-error">Preview generation failed</div>',
+                500,
+            )
 
 
 @app.route("/api/share/<prompt_id>", methods=["POST"])
@@ -380,7 +417,10 @@ def create_share_link(prompt_id):
         # Verify prompt exists
         prompt = prompt_manager.get_prompt(prompt_id)
         if not prompt:
-            return jsonify({"status": "error", "message": "Prompt not found"}), 404
+            return (
+                jsonify({"status": "error", "message": "Prompt not found"}),
+                404,
+            )
 
         # Get optional expiration from request
         data = request.get_json() or {}
@@ -406,7 +446,7 @@ def create_share_link(prompt_id):
             }
         )
 
-    except Exception as e:
+    except Exception:
         return (
             jsonify({"status": "error", "message": "Failed to create share link"}),
             500,
@@ -427,7 +467,10 @@ def start_tunnel():
 
     except Exception as e:
         logging.error(f"Error starting tunnel: {e}")
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/api/tunnel/stop", methods=["POST"])
@@ -439,7 +482,10 @@ def stop_tunnel():
 
     except Exception as e:
         logging.error(f"Error stopping tunnel: {e}")
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/api/tunnel/status")
@@ -451,7 +497,10 @@ def get_tunnel_status():
 
     except Exception as e:
         logging.error(f"Error getting tunnel status: {e}")
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/api/tunnel/url")
@@ -463,7 +512,10 @@ def get_tunnel_url():
 
     except Exception as e:
         logging.error(f"Error getting tunnel URL: {e}")
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+        return (
+            jsonify({"status": "error", "message": "Internal server error"}),
+            500,
+        )
 
 
 @app.route("/share/<token>/<prompt_id>")
@@ -485,7 +537,10 @@ def view_shared_prompt(token, prompt_id):
         share_info = get_share_manager().get_share_info(token)
 
         return render_template(
-            "share.html", prompt=prompt, share_info=share_info, is_shared_view=True
+            "share.html",
+            prompt=prompt,
+            share_info=share_info,
+            is_shared_view=True,
         )
 
     except Exception as e:

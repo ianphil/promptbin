@@ -43,7 +43,8 @@ class PromptManager:
             )
             logger.error(error_msg)
             logger.error(
-                "This may be due to a read-only file system. Consider using a writable directory like ~/promptbin-data"
+                "This may be due to a read-only file system. Consider using a "
+                "writable directory like ~/promptbin-data"
             )
             sys.exit(1)
         except Exception as e:
@@ -60,7 +61,8 @@ class PromptManager:
         """Validate that category is allowed"""
         if category not in self.VALID_CATEGORIES:
             raise ValueError(
-                f"Invalid category '{category}'. Must be one of: {self.VALID_CATEGORIES}"
+                f"Invalid category '{category}'. "
+                f"Must be one of: {self.VALID_CATEGORIES}"
             )
 
     def _validate_prompt_data(self, data: Dict[str, Any]) -> None:
@@ -147,7 +149,8 @@ class PromptManager:
                         # Remove old file when category changes
                         old_path.unlink()
                         logger.info(
-                            f"Moved prompt {prompt_id} from {old_category} to {data['category']}"
+                            f"Moved prompt {prompt_id} from {old_category} "
+                            f"to {data['category']}"
                         )
 
             # Write to new location
@@ -218,7 +221,8 @@ class PromptManager:
                                 prompts.append(prompt_data)
                             else:
                                 logger.warning(
-                                    f"Skipping invalid prompt data (None) in {json_file}"
+                                    f"Skipping invalid prompt data (None) "
+                                    f"in {json_file}"
                                 )
                     except Exception as e:
                         logger.error(f"Error reading prompt file {json_file}: {e}")
@@ -405,7 +409,8 @@ class PromptManager:
                 for prompt in prompts:
                     if prompt is None:
                         logger.warning(
-                            f"Found None prompt in category {category} - possible data integrity issue"
+                            f"Found None prompt in category {category} - "
+                            f"possible data integrity issue"
                         )
                         continue
                     # Collect unique tags
@@ -427,7 +432,9 @@ class PromptManager:
 
             # Sort recent activity and limit to 10
             stats["recent_activity"] = sorted(
-                stats["recent_activity"], key=lambda x: x["updated_at"], reverse=True
+                stats["recent_activity"],
+                key=lambda x: x["updated_at"],
+                reverse=True,
             )[:10]
 
             stats["total_tags"] = len(stats["total_tags"])

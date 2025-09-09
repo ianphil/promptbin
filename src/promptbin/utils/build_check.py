@@ -9,7 +9,6 @@ Run this before publishing to PyPI.
 import subprocess
 import sys
 import tempfile
-import os
 from pathlib import Path
 
 

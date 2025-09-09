@@ -7,12 +7,9 @@ with options to run individual components.
 """
 
 import argparse
-import asyncio
 import logging
 import os
 import sys
-import time
-from pathlib import Path
 
 # Configure UTF-8 encoding for Windows to support emojis
 if sys.platform == "win32":
@@ -53,7 +50,9 @@ Examples:
 
     # Configuration options
     parser.add_argument(
-        "--host", default="127.0.0.1", help="Host to bind to (default: 127.0.0.1)"
+        "--host",
+        default="127.0.0.1",
+        help="Host to bind to (default: 127.0.0.1)",
     )
     parser.add_argument(
         "--port", type=int, default=5001, help="Port to run on (default: 5001)"
@@ -114,7 +113,8 @@ def run_mcp_only(args):
 
 
 def run_both(args):
-    """Run both MCP server and web interface (MCP server will launch Flask subprocess)"""
+    """Run both MCP server and web interface
+    (MCP server will launch Flask subprocess)"""
     from .mcp.server import main as mcp_main
 
     # Set environment variables for MCP server (which will launch Flask subprocess)
@@ -124,7 +124,7 @@ def run_both(args):
     os.environ["PROMPTBIN_LOG_LEVEL"] = args.log_level
 
     print("🚀 Starting PromptBin (MCP server + web interface)...")
-    print(f"🤖 MCP server: Ready for AI tool connections")
+    print("🤖 MCP server: Ready for AI tool connections")
     print(f"🌐 Web interface: Will be available at http://{args.host}:{args.port}")
     print("💡 Note: Web interface runs as a subprocess when in MCP mode")
 

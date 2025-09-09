@@ -42,7 +42,8 @@ class TunnelManager:
 
         # Log configuration
         logger.info(
-            f"TunnelManager initialized: enabled={self._enabled}, rate_limit={self._rate_limit}, auto_start={self._auto_start}"
+            f"TunnelManager initialized: enabled={self._enabled}, "
+            f"rate_limit={self._rate_limit}, auto_start={self._auto_start}"
         )
 
         # Register cleanup on exit - let Flask handle signals
@@ -77,7 +78,10 @@ class TunnelManager:
         """
         try:
             result = subprocess.run(
-                ["devtunnel", "--version"], capture_output=True, text=True, timeout=10
+                ["devtunnel", "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0:
                 return True, "DevTunnel CLI is available"
@@ -86,7 +90,8 @@ class TunnelManager:
         except FileNotFoundError:
             return (
                 False,
-                "DevTunnel CLI not installed. Please install from https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/",
+                "DevTunnel CLI not installed. Please install from "
+                "https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/",
             )
         except subprocess.TimeoutExpired:
             return False, "DevTunnel CLI check timed out"
@@ -110,7 +115,8 @@ class TunnelManager:
             else:
                 return (
                     False,
-                    "Not authenticated. Please run 'devtunnel user login' or 'devtunnel user login -g' for GitHub",
+                    "Not authenticated. Please run 'devtunnel user login' "
+                    "or 'devtunnel user login -g' for GitHub",
                 )
         except FileNotFoundError:
             return False, "DevTunnel CLI not installed"
@@ -136,7 +142,8 @@ class TunnelManager:
         if len(self._ip_attempts[client_ip]) >= self._rate_limit:
             return (
                 False,
-                f"Rate limit exceeded. Maximum {self._rate_limit} attempts per {self._rate_limit_window.total_seconds()/60:.0f} minutes",
+                f"Rate limit exceeded. Maximum {self._rate_limit} attempts "
+                f"per {self._rate_limit_window.total_seconds()/60:.0f} minutes",
             )
 
         return True, "Rate limit check passed"
@@ -173,7 +180,9 @@ class TunnelManager:
         if not self._enabled:
             return {
                 "status": "error",
-                "message": "Dev Tunnels are disabled. Set DEVTUNNEL_ENABLED=true to enable.",
+                "message": (
+                    "Dev Tunnels are disabled. " "Set DEVTUNNEL_ENABLED=true to enable."
+                ),
             }
 
         # Check if tunnel is already running
@@ -242,7 +251,10 @@ class TunnelManager:
                     startup_output += output
                     return {
                         "status": "error",
-                        "message": f"Tunnel process terminated unexpectedly: {startup_output}",
+                        "message": (
+                            f"Tunnel process terminated unexpectedly: "
+                            f"{startup_output}"
+                        ),
                     }
 
                 # Read available output
@@ -279,13 +291,19 @@ class TunnelManager:
                 self.stop_tunnel()
                 return {
                     "status": "error",
-                    "message": f"Tunnel startup timed out or URL not found. Output: {startup_output}",
+                    "message": (
+                        f"Tunnel startup timed out or URL not found. "
+                        f"Output: {startup_output}"
+                    ),
                 }
 
         except Exception as e:
             logger.error(f"Error starting tunnel: {e}")
             self.cleanup()
-            return {"status": "error", "message": f"Failed to start tunnel: {str(e)}"}
+            return {
+                "status": "error",
+                "message": f"Failed to start tunnel: {str(e)}",
+            }
 
     def stop_tunnel(self) -> Dict[str, Any]:
         """
@@ -298,10 +316,16 @@ class TunnelManager:
         try:
             logger.info("Stopping tunnel...")
             self.cleanup()
-            return {"status": "success", "message": "Tunnel stopped successfully"}
+            return {
+                "status": "success",
+                "message": "Tunnel stopped successfully",
+            }
         except Exception as e:
             logger.error(f"Error stopping tunnel: {e}")
-            return {"status": "error", "message": f"Error stopping tunnel: {str(e)}"}
+            return {
+                "status": "error",
+                "message": f"Error stopping tunnel: {str(e)}",
+            }
 
     def get_status(self) -> Dict[str, Any]:
         """

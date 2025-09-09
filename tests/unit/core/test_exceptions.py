@@ -142,10 +142,12 @@ class TestErrorHandling:
         # Register services with nested dependencies
         self.container.register_singleton(DatabaseService, lambda c: DatabaseService())
         self.container.register_singleton(
-            RepositoryService, lambda c: RepositoryService(c.resolve(DatabaseService))
+            RepositoryService,
+            lambda c: RepositoryService(c.resolve(DatabaseService)),
         )
         self.container.register_singleton(
-            BusinessService, lambda c: BusinessService(c.resolve(RepositoryService))
+            BusinessService,
+            lambda c: BusinessService(c.resolve(RepositoryService)),
         )
 
         # Should fail when trying to resolve top-level service

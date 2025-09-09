@@ -26,7 +26,10 @@ class SetupChecker:
         """Check if devtunnel CLI is installed and accessible"""
         try:
             result = subprocess.run(
-                ["devtunnel", "--version"], capture_output=True, text=True, timeout=10
+                ["devtunnel", "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0:
                 version_info = result.stdout.strip()
@@ -86,7 +89,8 @@ class SetupChecker:
     def test_tunnel_creation(self) -> Tuple[bool, str]:
         """Test tunnel creation capability (non-destructive)"""
         try:
-            # Just test the help command for tunnel creation - doesn't create actual tunnel
+            # Just test the help command for tunnel creation
+            # - doesn't create actual tunnel
             result = subprocess.run(
                 ["devtunnel", "host", "--help"],
                 capture_output=True,
@@ -198,7 +202,12 @@ class SetupChecker:
             self.suggestions.extend(
                 [
                     "Install DevTunnel CLI:",
-                    "  Linux: curl -sL https://aka.ms/TunnelsCliDownload/linux-x64 -o devtunnel && chmod +x devtunnel && sudo mv devtunnel /usr/local/bin/",
+                    (
+                        "  Linux: curl -sL "
+                        "https://aka.ms/TunnelsCliDownload/linux-x64 "
+                        "-o devtunnel && chmod +x devtunnel && "
+                        "sudo mv devtunnel /usr/local/bin/"
+                    ),
                     "  macOS: brew install --cask devtunnel",
                     "  Windows: winget install Microsoft.devtunnel",
                     "  Or run: python scripts/install_devtunnel.py",
@@ -257,7 +266,10 @@ class SetupChecker:
 
         # Network Connectivity
         network_ok, network_info = self.check_network_connectivity()
-        self.results["network"] = {"connected": network_ok, "info": network_info}
+        self.results["network"] = {
+            "connected": network_ok,
+            "info": network_info,
+        }
 
         if not network_ok:
             self.issues.append("Network connectivity issues")
@@ -285,7 +297,8 @@ class SetupChecker:
             return "✅" if ok else "❌"
 
         print(
-            f"\n{status_icon(results['cli']['available'])} DevTunnel CLI: {results['cli']['info']}"
+            f"\n{status_icon(results['cli']['available'])} DevTunnel CLI: "
+            f"{results['cli']['info']}"
         )
         if results["cli"]["location"]:
             print(f"   Location: {results['cli']['location']}")
@@ -293,12 +306,14 @@ class SetupChecker:
         if results["cli"]["available"]:
             auth_ok = results["authentication"]["authenticated"]
             print(
-                f"{status_icon(auth_ok)} Authentication: {results['authentication']['info']}"
+                f"{status_icon(auth_ok)} Authentication: "
+                f"{results['authentication']['info']}"
             )
 
             tunnel_ok = results["tunnel_capability"]["available"]
             print(
-                f"{status_icon(tunnel_ok)} Tunnel Capability: {results['tunnel_capability']['info']}"
+                f"{status_icon(tunnel_ok)} Tunnel Capability: "
+                f"{results['tunnel_capability']['info']}"
             )
 
         network_ok = results["network"]["connected"]
@@ -306,12 +321,14 @@ class SetupChecker:
 
         python_info = results["python"]
         print(
-            f"ℹ️  Python: {python_info['python_version'].split()[0]} ({python_info['architecture']})"
+            f"ℹ️  Python: {python_info['python_version'].split()[0]} "
+            f"({python_info['architecture']})"
         )
 
         # Summary
         print(
-            f"\n{'🎉' if results['summary']['overall_status'] else '⚠️ '} Overall Status: ",
+            f"\n{'🎉' if results['summary']['overall_status'] else '⚠️ '} "
+            f"Overall Status: ",
             end="",
         )
         if results["summary"]["overall_status"]:
@@ -321,12 +338,12 @@ class SetupChecker:
 
         # Issues and suggestions
         if self.issues:
-            print(f"\nIssues Found:")
+            print("\nIssues Found:")
             for i, issue in enumerate(self.issues, 1):
                 print(f"  {i}. {issue}")
 
         if self.suggestions:
-            print(f"\nSuggested Fixes:")
+            print("\nSuggested Fixes:")
             for suggestion in self.suggestions:
                 if suggestion.startswith("  "):
                     print(f"    {suggestion}")
@@ -357,7 +374,7 @@ Options:
 The checker validates:
 - DevTunnel CLI installation and availability
 - Authentication status with Microsoft/GitHub
-- Network connectivity to Microsoft services  
+- Network connectivity to Microsoft services
 - Python environment and dependencies
 - PATH configuration and common issues
             """

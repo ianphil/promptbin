@@ -14,7 +14,6 @@ import re
 import signal
 import sys
 from typing import Dict, Any, Optional, List
-from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 from ..managers.prompt_manager import PromptManager
@@ -123,7 +122,11 @@ class PromptBinMCPServer:
     def _calculate_content_stats(self, content: str) -> Dict[str, Any]:
         """Calculate content statistics including word count and token estimation"""
         if not content:
-            return {"word_count": 0, "token_count": 0, "template_variables": []}
+            return {
+                "word_count": 0,
+                "token_count": 0,
+                "template_variables": [],
+            }
 
         # Calculate word count (split on whitespace and count non-empty strings)
         words = [word for word in content.split() if word.strip()]
@@ -142,7 +145,8 @@ class PromptBinMCPServer:
         }
 
     def _format_prompt_for_mcp(self, prompt_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Transform PromptManager data to MCP-compliant format with enhanced metadata"""
+        """Transform PromptManager data to MCP-compliant format
+        with enhanced metadata"""
         if not prompt_data:
             return {}
 
@@ -232,7 +236,9 @@ class PromptBinMCPServer:
 
         @self.mcp.tool()
         def search_prompts(
-            query: str, category: Optional[str] = None, limit: Optional[int] = None
+            query: str,
+            category: Optional[str] = None,
+            limit: Optional[int] = None,
         ) -> Dict[str, Any]:
             """Search prompts by content, title, tags, or description"""
             try:
@@ -343,7 +349,8 @@ def main():
         if server.flask_manager:
             asyncio.run(server.flask_manager.start_flask())
             server.logger.info(
-                f"Flask web interface started at http://{server.config['flask_host']}:{server.flask_manager.port}"
+                f"Flask web interface started at "
+                f"http://{server.config['flask_host']}:{server.flask_manager.port}"
             )
 
         # Start the MCP server directly using FastMCP's synchronous run method

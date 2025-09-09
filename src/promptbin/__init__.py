@@ -1,5 +1,5 @@
 """
-PromptBin - Easy-to-use MCP server for prompt management with web interface and secure sharing.
+PromptBin - Easy-to-use MCP server for prompt management with web interface.
 
 A reference implementation for MCP (Model Context Protocol) server integration with
 comprehensive prompt management capabilities.
