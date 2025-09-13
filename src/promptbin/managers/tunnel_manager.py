@@ -28,7 +28,8 @@ class TunnelManager:
         self.tunnel_id = None
         self._ip_attempts = defaultdict(list)  # IP -> list of attempt timestamps
 
-        # Use injected configuration or fall back to environment variables for backward compatibility
+        # Use injected configuration or fall back to environment variables for
+        # backward compatibility
         if config:
             self._enabled = config.devtunnel_enabled
             self._rate_limit = config.devtunnel_rate_limit

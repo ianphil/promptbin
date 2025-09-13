@@ -9,7 +9,6 @@ the Flask web interface lifecycle.
 
 import asyncio
 import logging
-import os
 import re
 import signal
 import sys
@@ -20,7 +19,7 @@ from ..managers.prompt_manager import PromptManager
 from ..core.config import PromptBinConfig
 
 if TYPE_CHECKING:
-    from ..core.config import PromptBinConfig
+    pass
 
 
 class PromptBinMCPServer:

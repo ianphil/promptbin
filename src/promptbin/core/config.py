@@ -6,10 +6,8 @@ with validation, type conversion, and sensible defaults.
 """
 
 import os
-import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from .exceptions import ServiceRegistrationError
 
@@ -122,7 +120,8 @@ class PromptBinConfig:
             )
         if self.devtunnel_log_level not in valid_log_levels:
             errors.append(
-                f"Devtunnel log level '{self.devtunnel_log_level}' must be one of {valid_log_levels}"
+                f"Devtunnel log level '{self.devtunnel_log_level}' must be one of "
+                f"{valid_log_levels}"
             )
 
         # Validate data directory
@@ -130,7 +129,8 @@ class PromptBinConfig:
             expanded_data_dir = Path(self.data_dir).expanduser()
             if not expanded_data_dir.parent.exists():
                 errors.append(
-                    f"Parent directory of data_dir '{expanded_data_dir.parent}' does not exist"
+                    f"Parent directory of data_dir '{expanded_data_dir.parent}' "
+                    f"does not exist"
                 )
         except (OSError, ValueError) as e:
             errors.append(f"Invalid data_dir path '{self.data_dir}': {e}")
@@ -142,13 +142,15 @@ class PromptBinConfig:
             )
         if self.devtunnel_rate_window < 1:
             errors.append(
-                f"Devtunnel rate window {self.devtunnel_rate_window} must be >= 1 minute"
+                f"Devtunnel rate window {self.devtunnel_rate_window} must be "
+                f">= 1 minute"
             )
 
         # Validate timeout parameters
         if self.health_check_interval < 5:
             errors.append(
-                f"Health check interval {self.health_check_interval} must be >= 5 seconds"
+                f"Health check interval {self.health_check_interval} must be "
+                f">= 5 seconds"
             )
         if self.shutdown_timeout < 1:
             errors.append(
