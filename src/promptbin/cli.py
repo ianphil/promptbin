@@ -120,7 +120,7 @@ def run_mcp_only(args):
 
     # Create and run MCP server with configuration
     server = PromptBinMCPServer(config=config)
-    return server.run()
+    return server.mcp.run()
 
 
 def run_both(args):
@@ -147,7 +147,7 @@ def run_both(args):
 
     # Create and run MCP server with configuration
     server = PromptBinMCPServer(config=config)
-    return server.run()
+    return server.mcp.run()
 
 
 def main():
