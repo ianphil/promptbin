@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 from .managers.prompt_manager import PromptManager
 from .managers.share_manager import ShareManager
 from .managers.tunnel_manager import TunnelManager
+from .core.config import PromptBinConfig
 import markdown
+from typing import Optional
 
 try:
     import tomllib  # Python 3.11+
@@ -17,32 +19,64 @@ except ModuleNotFoundError:  # pragma: no cover
 
 load_dotenv()
 
+# Global managers (will be initialized by init_app or main)
+share_manager = None
+prompt_manager = None
+tunnel_manager = None
+app_config = None  # Will hold PromptBinConfig instance
+
+# Create Flask app instance
 app = Flask(__name__, template_folder="web/templates", static_folder="web/static")
-app.config["SECRET_KEY"] = os.environ.get(
-    "SECRET_KEY", "dev-secret-key-change-in-production"
-)
-app.config["START_TIME"] = time.time()
-app.config["MODE"] = "standalone"
-
-# Initialize managers with defaults (may be updated when app starts)
-share_manager = None  # Will be initialized after parsing args
-prompt_manager = PromptManager()  # Default initialization
-tunnel_manager = None  # Will be initialized with flask port
 
 
-# Helper function to get share_manager
+def init_app(config: Optional[PromptBinConfig] = None) -> Flask:
+    """
+    Initialize Flask app with configuration.
+    
+    Args:
+        config: PromptBin configuration instance. If None, loads from environment.
+        
+    Returns:
+        Configured Flask app instance
+    """
+    global share_manager, prompt_manager, tunnel_manager, app_config
+    
+    # Use provided config or load from environment
+    if config is None:
+        app_config = PromptBinConfig.from_environment()
+    else:
+        app_config = config
+    
+    # Configure Flask app
+    app.config["SECRET_KEY"] = app_config.secret_key
+    app.config["START_TIME"] = time.time()
+    app.config["MODE"] = "standalone"
+    
+    # Initialize managers with configuration
+    prompt_manager = PromptManager(data_dir=str(app_config.get_expanded_data_dir()))
+    
+    share_file = app_config.get_expanded_data_dir() / "shares.json"
+    share_manager = ShareManager(share_file=str(share_file))
+    
+    tunnel_manager = TunnelManager(flask_port=app_config.flask_port, config=app_config)
+    
+    return app
+
+
+# Helper function to get share_manager with backward compatibility
 def get_share_manager():
     global share_manager
     if share_manager is None:
-        share_manager = ShareManager()  # Use default path as fallback
+        # Backward compatibility fallback
+        share_manager = ShareManager()
     return share_manager
 
 
-# Helper function to get tunnel_manager
+# Helper function to get tunnel_manager with backward compatibility
 def get_tunnel_manager():
     global tunnel_manager
     if tunnel_manager is None:
-        # Use the same port that Flask is running on
+        # Backward compatibility fallback - read from environment
         flask_port = int(os.environ.get("FLASK_RUN_PORT", 5001))
         tunnel_manager = TunnelManager(flask_port=flask_port)
     return tunnel_manager
@@ -587,18 +621,20 @@ def main():
         level=getattr(logging, str(args.log_level).upper(), logging.INFO)
     )
 
-    # Reinitialize prompt manager with the parsed data directory
-    global prompt_manager
-    prompt_manager = PromptManager(data_dir=args.data_dir)
+    # Create configuration with command line overrides
+    config = PromptBinConfig.from_environment()
+    
+    # Override config with command line arguments if provided
+    config.flask_host = args.host
+    config.flask_port = args.port
+    config.data_dir = args.data_dir
+    config.log_level = args.log_level.upper()
+    
+    # Validate updated configuration
+    config.validate()
 
-    # Reinitialize share manager with the parsed data directory
-    global share_manager
-    share_file = os.path.join(args.data_dir, "shares.json")
-    share_manager = ShareManager(share_file=share_file)
-
-    # Initialize tunnel manager with the correct Flask port
-    global tunnel_manager
-    tunnel_manager = TunnelManager(flask_port=args.port)
+    # Initialize app with configuration
+    init_app(config)
 
     # Apply mode and start time
     app.config["MODE"] = args.mode
@@ -607,7 +643,7 @@ def main():
     # Debug mode only for standalone
     debug = args.mode != "mcp-managed"
 
-    app.run(host=args.host, port=args.port, debug=debug)
+    app.run(host=config.flask_host, port=config.flask_port, debug=debug)
 
 
 if __name__ == "__main__":

@@ -3,10 +3,12 @@ import time
 import re
 import logging
 import atexit
-import os
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..core.config import PromptBinConfig
 
 logger = logging.getLogger(__name__)
 
@@ -17,28 +19,36 @@ class TunnelManager:
     rate limiting, and security features.
     """
 
-    def __init__(self, flask_port: int = 5001):
+    def __init__(self, flask_port: int = 5001, config: Optional["PromptBinConfig"] = None):
         self.flask_port = flask_port
         self.tunnel_process = None
         self.tunnel_url = None
         self.tunnel_id = None
         self._ip_attempts = defaultdict(list)  # IP -> list of attempt timestamps
 
-        # Read configuration from environment variables
-        self._enabled = os.environ.get("DEVTUNNEL_ENABLED", "true").lower() == "true"
-        self._rate_limit = int(os.environ.get("DEVTUNNEL_RATE_LIMIT", "5"))
-        self._auto_start = (
-            os.environ.get("DEVTUNNEL_AUTO_START", "false").lower() == "true"
-        )
-
-        # Rate limit window in minutes
-        rate_window_minutes = int(os.environ.get("DEVTUNNEL_RATE_WINDOW", "30"))
-        self._rate_limit_window = timedelta(minutes=rate_window_minutes)
+        # Use injected configuration or fall back to environment variables for backward compatibility
+        if config:
+            self._enabled = config.devtunnel_enabled
+            self._rate_limit = config.devtunnel_rate_limit
+            self._auto_start = config.devtunnel_auto_start
+            self._rate_limit_window = timedelta(minutes=config.devtunnel_rate_window)
+            tunnel_log_level = config.devtunnel_log_level
+        else:
+            # Backward compatibility - read from environment variables directly
+            import os
+            self._enabled = os.environ.get("DEVTUNNEL_ENABLED", "true").lower() == "true"
+            self._rate_limit = int(os.environ.get("DEVTUNNEL_RATE_LIMIT", "5"))
+            self._auto_start = (
+                os.environ.get("DEVTUNNEL_AUTO_START", "false").lower() == "true"
+            )
+            # Rate limit window in minutes
+            rate_window_minutes = int(os.environ.get("DEVTUNNEL_RATE_WINDOW", "30"))
+            self._rate_limit_window = timedelta(minutes=rate_window_minutes)
+            tunnel_log_level = os.environ.get("DEVTUNNEL_LOG_LEVEL", "info").upper()
 
         # Configure logging level for tunnel operations
-        log_level = os.environ.get("DEVTUNNEL_LOG_LEVEL", "info").upper()
-        if log_level in ["DEBUG", "INFO", "WARNING", "ERROR"]:
-            logger.setLevel(getattr(logging, log_level))
+        if tunnel_log_level in ["DEBUG", "INFO", "WARNING", "ERROR"]:
+            logger.setLevel(getattr(logging, tunnel_log_level))
 
         # Log configuration
         logger.info(

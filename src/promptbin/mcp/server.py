@@ -13,20 +13,29 @@ import os
 import re
 import signal
 import sys
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, TYPE_CHECKING
 
 from mcp.server.fastmcp import FastMCP
 from ..managers.prompt_manager import PromptManager
+from ..core.config import PromptBinConfig
+
+if TYPE_CHECKING:
+    from ..core.config import PromptBinConfig
 
 
 class PromptBinMCPServer:
     """MCP server for PromptBin with Flask subprocess management"""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Optional["PromptBinConfig"] = None):
         """Initialize the MCP server with configuration"""
-        self.config = config or self._load_default_config()
+        # Use injected configuration or load from environment
+        if config is None:
+            self.config = PromptBinConfig.from_environment()
+        else:
+            self.config = config
+        
         self.mcp = FastMCP("PromptBin")
-        self.prompt_manager = PromptManager(data_dir=self.config["data_dir"])
+        self.prompt_manager = PromptManager(data_dir=str(self.config.get_expanded_data_dir()))
         self.flask_process = None
         self.is_running = False
         self.flask_manager = None
@@ -53,32 +62,24 @@ class PromptBinMCPServer:
             from ..utils.flask_manager import FlaskManager
 
             self.flask_manager = FlaskManager(
-                host=self.config["flask_host"],
-                base_port=self.config["flask_port"],
-                log_level=self.config["log_level"],
-                data_dir=self.config["data_dir"],
-                health_check_interval=self.config["health_check_interval"],
-                shutdown_timeout=self.config["shutdown_timeout"],
+                host=self.config.flask_host,
+                base_port=self.config.flask_port,
+                log_level=self.config.log_level,
+                data_dir=str(self.config.get_expanded_data_dir()),
+                health_check_interval=self.config.health_check_interval,
+                shutdown_timeout=self.config.shutdown_timeout,
             )
             self.logger.info("Flask manager configured")
         except Exception as e:
             self.logger.error(f"Error setting up Flask manager: {e}")
 
-    def _load_default_config(self) -> Dict[str, Any]:
-        """Hardcoded-first configuration with sensible defaults"""
-        return {
-            "mode": "mcp-managed",
-            "flask_port": 5001,
-            "flask_host": "127.0.0.1",
-            "log_level": "INFO",
-            "data_dir": os.path.expanduser("~/promptbin-data"),
-            "health_check_interval": 30,
-            "shutdown_timeout": 10,
-        }
+    def _load_default_config(self) -> "PromptBinConfig":
+        """Load default configuration (deprecated - kept for backward compatibility)"""
+        return PromptBinConfig.from_environment()
 
     def _setup_logging(self):
         """Configure structured logging"""
-        log_level = getattr(logging, self.config["log_level"].upper(), logging.INFO)
+        log_level = getattr(logging, self.config.log_level.upper(), logging.INFO)
 
         # Configure root logger
         logging.basicConfig(
@@ -105,9 +106,7 @@ class PromptBinMCPServer:
 
     def _safe_config_log(self) -> Dict[str, Any]:
         """Return configuration safe for logging (no sensitive data)"""
-        safe_config = self.config.copy()
-        # Remove any sensitive keys if they exist
-        return safe_config
+        return self.config.to_dict()
 
     def _extract_template_variables(self, content: str) -> List[str]:
         """Extract template variables from content using {{variable}} pattern"""
