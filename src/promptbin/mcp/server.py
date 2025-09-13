@@ -98,7 +98,8 @@ class PromptBinMCPServer:
 
         def signal_handler(signum, frame):
             self.logger.info(f"Received signal {signum}, initiating shutdown...")
-            asyncio.create_task(self.shutdown())
+            # Set flag to trigger shutdown in main loop instead of creating async task
+            self.is_running = False
 
         if hasattr(signal, "SIGTERM"):
             signal.signal(signal.SIGTERM, signal_handler)
@@ -322,20 +323,28 @@ class PromptBinMCPServer:
     async def shutdown(self):
         """Gracefully shutdown the MCP server and cleanup resources"""
         if not self.is_running:
+            self.logger.debug("Shutdown called but server already stopped")
             return
 
         self.logger.info("Shutting down PromptBin MCP Server...")
         self.is_running = False
 
         try:
-            # Phase 3: Stop Flask subprocess gracefully
+            # Stop Flask subprocess gracefully
             if hasattr(self, "flask_manager") and self.flask_manager:
+                self.logger.info("Stopping Flask web interface...")
                 await self.flask_manager.stop_flask()
+                self.logger.info("Flask web interface stopped successfully")
+            else:
+                self.logger.debug("No Flask manager to stop")
 
             self.logger.info("MCP Server shutdown complete")
 
         except Exception as e:
             self.logger.error(f"Error during shutdown: {e}")
+            import traceback
+
+            self.logger.debug(f"Shutdown error traceback: {traceback.format_exc()}")
             raise
 
 
@@ -344,6 +353,7 @@ def main():
     server = None
     try:
         server = PromptBinMCPServer()
+        server.is_running = True
 
         # Start the Flask subprocess if we have a manager
         if server.flask_manager:
@@ -356,14 +366,18 @@ def main():
         # Start the MCP server directly using FastMCP's synchronous run method
         server.mcp.run()
     except KeyboardInterrupt:
-        pass
+        server.logger.info("Received KeyboardInterrupt, shutting down...")
+        if server:
+            server.is_running = False
     except Exception as e:
         logging.error(f"Fatal error: {e}")
+        if server:
+            server.is_running = False
         return 1
     finally:
         if server:
             try:
-                # Use asyncio.run for the shutdown method
+                # Ensure proper shutdown regardless of how we got here
                 asyncio.run(server.shutdown())
             except Exception as shutdown_error:
                 logging.error(f"Error during shutdown: {shutdown_error}")

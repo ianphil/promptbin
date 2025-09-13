@@ -1,8 +1,8 @@
 import asyncio
+import atexit
 import logging
 import os
 import socket
-import sys
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 
@@ -45,6 +45,13 @@ class FlaskManager:
     )
     _restart_count: int = field(default=0, init=False)
     _monitor_task: Optional[asyncio.Task] = field(default=None, init=False)
+    _atexit_registered: bool = field(default=False, init=False)
+
+    def __post_init__(self):
+        """Register cleanup handler on initialization"""
+        if not self._atexit_registered:
+            atexit.register(self._emergency_cleanup)
+            self._atexit_registered = True
 
     async def start_flask(self) -> None:
         if self.process and self.process.returncode is None:
@@ -52,9 +59,10 @@ class FlaskManager:
             return
 
         self.port = find_available_port(self.base_port)
-        
+
         # Use the promptbin CLI command directly to run just the web interface
         # This works in the same environment context as the parent MCP process
+        # Set PROMPTBIN_MCP_MANAGED=true to indicate this is a subprocess
         cmd = [
             "promptbin",
             "--web",
@@ -68,6 +76,10 @@ class FlaskManager:
             self.data_dir,
         ]
 
+        # Set environment variable to indicate MCP-managed mode
+        env = os.environ.copy()
+        env["PROMPTBIN_MCP_MANAGED"] = "true"
+
         self._logger.info(f"Starting Flask on {self.host}:{self.port} ...")
 
         if self.debug_mode:
@@ -78,13 +90,14 @@ class FlaskManager:
             stderr_file = open(os.path.join(log_dir, "flask_stderr.log"), "w")
 
             self.process = await asyncio.create_subprocess_exec(
-                *cmd, stdout=stdout_file, stderr=stderr_file
+                *cmd, stdout=stdout_file, stderr=stderr_file, env=env
             )
         else:
             self.process = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.DEVNULL,
                 stderr=asyncio.subprocess.DEVNULL,
+                env=env,
             )
 
         # Give Flask more time to start up before health checking
@@ -100,22 +113,30 @@ class FlaskManager:
             self._monitor_task = asyncio.create_task(self.monitor_loop())
 
     async def stop_flask(self) -> None:
+        """Stop Flask subprocess and clean up all associated processes and tasks"""
         if not self.process:
             return
+
         try:
-            self._logger.info("Stopping Flask process ...")
-            self.process.terminate()
-            try:
-                await asyncio.wait_for(
-                    self.process.wait(), timeout=self.shutdown_timeout
-                )
-            except asyncio.TimeoutError:
-                self._logger.warning("Flask did not exit on SIGTERM; killing...")
-                self.process.kill()
+            self._logger.info("Stopping Flask process and monitor task...")
+
+            # First, cancel the monitor task if it's running
+            if self._monitor_task and not self._monitor_task.done():
+                self._logger.debug("Cancelling monitor task...")
+                self._monitor_task.cancel()
                 try:
-                    await asyncio.wait_for(self.process.wait(), timeout=5)
-                except asyncio.TimeoutError:
-                    self._logger.error("Flask failed to terminate after SIGKILL")
+                    await asyncio.wait_for(self._monitor_task, timeout=2)
+                except (asyncio.CancelledError, asyncio.TimeoutError):
+                    pass  # Expected for cancelled tasks
+                except Exception as e:
+                    self._logger.warning(f"Error cancelling monitor task: {e}")
+
+            # Get the main process PID for process tree cleanup
+            main_pid = self.process.pid
+
+            # Terminate the process tree (including child processes)
+            await self._terminate_process_tree(main_pid)
+
         finally:
             self._cleanup_process_refs()
 
@@ -182,5 +203,111 @@ class FlaskManager:
         }
 
     def _cleanup_process_refs(self):
+        """Clean up process references and cancel tasks"""
+        if self._monitor_task and not self._monitor_task.done():
+            self._monitor_task.cancel()
+        self._monitor_task = None
         self.process = None
         self.port = None
+
+    async def _terminate_process_tree(self, pid: int) -> None:
+        """Terminate a process and all its children"""
+        try:
+            parent = psutil.Process(pid)
+
+            # Get all child processes recursively
+            children = parent.children(recursive=True)
+            all_processes = [parent] + children
+
+            self._logger.debug(
+                f"Found {len(all_processes)} processes to terminate (PID {pid})"
+            )
+
+            # First, send SIGTERM to all processes
+            for proc in all_processes:
+                try:
+                    if proc.is_running():
+                        self._logger.debug(f"Terminating process {proc.pid}")
+                        proc.terminate()
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+
+            # Wait for processes to terminate gracefully
+            _, alive = psutil.wait_procs(all_processes, timeout=self.shutdown_timeout)
+
+            # Force kill any remaining processes
+            if alive:
+                self._logger.warning(f"Force killing {len(alive)} remaining processes")
+                for proc in alive:
+                    try:
+                        if proc.is_running():
+                            self._logger.debug(f"Force killing process {proc.pid}")
+                            proc.kill()
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+
+                # Final wait for force-killed processes
+                psutil.wait_procs(alive, timeout=3)
+
+        except psutil.NoSuchProcess:
+            self._logger.debug(f"Process {pid} already terminated")
+        except Exception as e:
+            self._logger.error(f"Error terminating process tree for PID {pid}: {e}")
+
+    def _emergency_cleanup(self) -> None:
+        """Emergency cleanup function called by atexit"""
+        if self.process and self.process.returncode is None:
+            try:
+                self._logger.warning(
+                    "Emergency cleanup: terminating Flask subprocess and all children"
+                )
+                # Use synchronous process termination for atexit
+                if hasattr(self.process, "pid"):
+                    try:
+                        parent = psutil.Process(self.process.pid)
+                        children = parent.children(recursive=True)
+                        all_processes = [parent] + children
+
+                        self._logger.info(
+                            f"Emergency cleanup: found {len(all_processes)} "
+                            f"processes to terminate"
+                        )
+
+                        for proc in all_processes:
+                            try:
+                                if proc.is_running():
+                                    self._logger.debug(
+                                        f"Emergency cleanup: terminating PID {proc.pid}"
+                                    )
+                                    proc.terminate()
+                            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                                pass
+
+                        # Wait briefly, then force kill if needed
+                        _, alive = psutil.wait_procs(all_processes, timeout=3)
+                        if alive:
+                            self._logger.warning(
+                                f"Emergency cleanup: force killing {len(alive)} "
+                                f"remaining processes"
+                            )
+                            for proc in alive:
+                                try:
+                                    if proc.is_running():
+                                        self._logger.debug(
+                                            f"Emergency cleanup: force killing "
+                                            f"PID {proc.pid}"
+                                        )
+                                        proc.kill()
+                                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                                    pass
+
+                        self._logger.info("Emergency cleanup completed")
+
+                    except Exception as e:
+                        self._logger.error(f"Emergency cleanup failed: {e}")
+            except Exception as e:
+                # Don't let atexit cleanup fail, but try to log if possible
+                try:
+                    self._logger.error(f"Emergency cleanup exception: {e}")
+                except Exception:
+                    pass
