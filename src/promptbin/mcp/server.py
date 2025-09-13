@@ -350,7 +350,7 @@ def main():
             asyncio.run(server.flask_manager.start_flask())
             server.logger.info(
                 f"Flask web interface started at "
-                f"http://{server.config['flask_host']}:{server.flask_manager.port}"
+                f"http://{server.config.flask_host}:{server.flask_manager.port}"
             )
 
         # Start the MCP server directly using FastMCP's synchronous run method
