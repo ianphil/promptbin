@@ -70,7 +70,7 @@ Examples:
     )
 
     # Version
-    parser.add_argument("--version", action="version", version="PromptBin 0.4.1")
+    parser.add_argument("--version", action="version", version="PromptBin 0.4.2")
 
     return parser
 

@@ -52,13 +52,12 @@ class FlaskManager:
             return
 
         self.port = find_available_port(self.base_port)
-        # Run app.py as a module to handle relative imports properly
+        
+        # Use the promptbin CLI command directly to run just the web interface
+        # This works in the same environment context as the parent MCP process
         cmd = [
-            sys.executable,
-            "-m",
-            "promptbin.app",
-            "--mode",
-            "mcp-managed",
+            "promptbin",
+            "--web",
             "--host",
             self.host,
             "--port",
