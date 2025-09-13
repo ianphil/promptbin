@@ -15,6 +15,8 @@ description: Commit and push current work with code quality checks
    - `make format` - Format code with black
    - `make format-check` - Verify formatting is correct
    - `make lint` - Run flake8 linting
+   - `make test` - Run tests
+   - `make test-cov` - Run Test coverage
    - If any step fails, fix the issues and re-run until all checks pass
 2. **Stage changes**: `git add .` (stage all changes including any formatting fixes)
 3. **Commit**: If commit message provided in $ARGUMENTS, use it. Otherwise, create a short descriptive commit message based on the changes shown above.

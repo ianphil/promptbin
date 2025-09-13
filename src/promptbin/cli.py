@@ -70,7 +70,7 @@ Examples:
     )
 
     # Version
-    parser.add_argument("--version", action="version", version="PromptBin 0.5.0")
+    parser.add_argument("--version", action="version", version="PromptBin 0.5.1")
 
     return parser
 
@@ -153,6 +153,17 @@ def run_both(args):
 
     # Create and run MCP server with configuration
     server = PromptBinMCPServer(config=config)
+
+    # Start Flask subprocess (same as MCP server's main() function)
+    if server.flask_manager:
+        import asyncio
+
+        asyncio.run(server.flask_manager.start_flask())
+        server.logger.info(
+            f"Flask web interface started at "
+            f"http://{server.config.flask_host}:{server.flask_manager.port}"
+        )
+
     return server.mcp.run()
 
 
