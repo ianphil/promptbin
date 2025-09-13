@@ -99,8 +99,14 @@ def run_web_only(args):
 
     # Initialize and run Flask app
     app = init_app(config)
-    app.config["MODE"] = "standalone"
-    app.run(host=config.flask_host, port=config.flask_port, debug=True)
+
+    # Check if this is being run as a subprocess by MCP server
+    is_mcp_managed = os.environ.get("PROMPTBIN_MCP_MANAGED", "false").lower() == "true"
+    app.config["MODE"] = "mcp-managed" if is_mcp_managed else "standalone"
+
+    # Disable debug mode for MCP-managed subprocesses to prevent reloader issues
+    debug_mode = not is_mcp_managed
+    app.run(host=config.flask_host, port=config.flask_port, debug=debug_mode)
 
 
 def run_mcp_only(args):
