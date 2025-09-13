@@ -90,12 +90,12 @@ def run_web_only(args):
     config.validate()
 
     # Configure logging
-    logging.basicConfig(
-        level=getattr(logging, config.log_level.upper(), logging.INFO)
+    logging.basicConfig(level=getattr(logging, config.log_level.upper(), logging.INFO))
+
+    print(
+        f"🌐 Starting PromptBin web interface at http://{config.flask_host}:{config.flask_port}"
     )
 
-    print(f"🌐 Starting PromptBin web interface at http://{config.flask_host}:{config.flask_port}")
-    
     # Initialize and run Flask app
     app = init_app(config)
     app.config["MODE"] = "standalone"
@@ -116,7 +116,7 @@ def run_mcp_only(args):
     config.validate()
 
     print("🤖 Starting PromptBin MCP server...")
-    
+
     # Create and run MCP server with configuration
     server = PromptBinMCPServer(config=config)
     return server.run()
@@ -138,7 +138,9 @@ def run_both(args):
 
     print("🚀 Starting PromptBin (MCP server + web interface)...")
     print("🤖 MCP server: Ready for AI tool connections")
-    print(f"🌐 Web interface: Will be available at http://{config.flask_host}:{config.flask_port}")
+    print(
+        f"🌐 Web interface: Will be available at http://{config.flask_host}:{config.flask_port}"
+    )
     print("💡 Note: Web interface runs as a subprocess when in MCP mode")
 
     # Create and run MCP server with configuration

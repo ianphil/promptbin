@@ -19,7 +19,9 @@ class TunnelManager:
     rate limiting, and security features.
     """
 
-    def __init__(self, flask_port: int = 5001, config: Optional["PromptBinConfig"] = None):
+    def __init__(
+        self, flask_port: int = 5001, config: Optional["PromptBinConfig"] = None
+    ):
         self.flask_port = flask_port
         self.tunnel_process = None
         self.tunnel_url = None
@@ -36,7 +38,10 @@ class TunnelManager:
         else:
             # Backward compatibility - read from environment variables directly
             import os
-            self._enabled = os.environ.get("DEVTUNNEL_ENABLED", "true").lower() == "true"
+
+            self._enabled = (
+                os.environ.get("DEVTUNNEL_ENABLED", "true").lower() == "true"
+            )
             self._rate_limit = int(os.environ.get("DEVTUNNEL_RATE_LIMIT", "5"))
             self._auto_start = (
                 os.environ.get("DEVTUNNEL_AUTO_START", "false").lower() == "true"

@@ -33,9 +33,11 @@ class PromptBinMCPServer:
             self.config = PromptBinConfig.from_environment()
         else:
             self.config = config
-        
+
         self.mcp = FastMCP("PromptBin")
-        self.prompt_manager = PromptManager(data_dir=str(self.config.get_expanded_data_dir()))
+        self.prompt_manager = PromptManager(
+            data_dir=str(self.config.get_expanded_data_dir())
+        )
         self.flask_process = None
         self.is_running = False
         self.flask_manager = None

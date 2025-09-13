@@ -32,34 +32,34 @@ app = Flask(__name__, template_folder="web/templates", static_folder="web/static
 def init_app(config: Optional[PromptBinConfig] = None) -> Flask:
     """
     Initialize Flask app with configuration.
-    
+
     Args:
         config: PromptBin configuration instance. If None, loads from environment.
-        
+
     Returns:
         Configured Flask app instance
     """
     global share_manager, prompt_manager, tunnel_manager, app_config
-    
+
     # Use provided config or load from environment
     if config is None:
         app_config = PromptBinConfig.from_environment()
     else:
         app_config = config
-    
+
     # Configure Flask app
     app.config["SECRET_KEY"] = app_config.secret_key
     app.config["START_TIME"] = time.time()
     app.config["MODE"] = "standalone"
-    
+
     # Initialize managers with configuration
     prompt_manager = PromptManager(data_dir=str(app_config.get_expanded_data_dir()))
-    
+
     share_file = app_config.get_expanded_data_dir() / "shares.json"
     share_manager = ShareManager(share_file=str(share_file))
-    
+
     tunnel_manager = TunnelManager(flask_port=app_config.flask_port, config=app_config)
-    
+
     return app
 
 
@@ -623,13 +623,13 @@ def main():
 
     # Create configuration with command line overrides
     config = PromptBinConfig.from_environment()
-    
+
     # Override config with command line arguments if provided
     config.flask_host = args.host
     config.flask_port = args.port
     config.data_dir = args.data_dir
     config.log_level = args.log_level.upper()
-    
+
     # Validate updated configuration
     config.validate()
 

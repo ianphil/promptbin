@@ -219,13 +219,10 @@ class ServiceContainer:
     def register_config(self) -> None:
         """
         Register PromptBin configuration as a singleton service.
-        
+
         Convenience method to register the centralized configuration
         with the dependency injection container.
         """
         from .config import PromptBinConfig, create_config
-        
-        self.register_singleton(
-            PromptBinConfig, 
-            lambda container: create_config()
-        )
+
+        self.register_singleton(PromptBinConfig, lambda container: create_config())

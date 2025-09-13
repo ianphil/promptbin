@@ -25,21 +25,22 @@ class TestConfigurationServiceIntegration:
         """Test successful configuration registration."""
         with patch.dict(os.environ, {}, clear=True):
             self.container.register_config()
-            
+
             assert self.container.is_registered(PromptBinConfig)
-            
+
             # Should be registered as singleton
             registered_services = self.container.get_registered_services()
             from promptbin.core.container import ServiceLifetime
+
             assert registered_services[PromptBinConfig] == ServiceLifetime.SINGLETON
 
     def test_resolve_config_success(self):
         """Test successful configuration resolution."""
         with patch.dict(os.environ, {}, clear=True):
             self.container.register_config()
-            
+
             config = self.container.resolve(PromptBinConfig)
-            
+
             assert isinstance(config, PromptBinConfig)
             assert config.flask_host == "127.0.0.1"
             assert config.flask_port == 5001
@@ -48,10 +49,10 @@ class TestConfigurationServiceIntegration:
         """Test that resolved configuration instances are singletons."""
         with patch.dict(os.environ, {}, clear=True):
             self.container.register_config()
-            
+
             config1 = self.container.resolve(PromptBinConfig)
             config2 = self.container.resolve(PromptBinConfig)
-            
+
             # Should be the exact same instance
             assert config1 is config2
 
@@ -60,13 +61,13 @@ class TestConfigurationServiceIntegration:
         env_vars = {
             "PROMPTBIN_HOST": "0.0.0.0",
             "PROMPTBIN_PORT": "8080",
-            "PROMPTBIN_LOG_LEVEL": "DEBUG"
+            "PROMPTBIN_LOG_LEVEL": "DEBUG",
         }
-        
+
         with patch.dict(os.environ, env_vars):
             self.container.register_config()
             config = self.container.resolve(PromptBinConfig)
-            
+
             assert config.flask_host == "0.0.0.0"
             assert config.flask_port == 8080
             assert config.log_level == "DEBUG"
@@ -75,7 +76,9 @@ class TestConfigurationServiceIntegration:
         """Test that invalid configuration fails during resolution."""
         with patch.dict(os.environ, {"PROMPTBIN_PORT": "80"}):  # Invalid port
             self.container.register_config()
-            with pytest.raises(ServiceRegistrationError, match="Configuration validation failed"):
+            with pytest.raises(
+                ServiceRegistrationError, match="Configuration validation failed"
+            ):
                 self.container.resolve(PromptBinConfig)
 
     def test_resolve_config_not_registered(self):
@@ -87,18 +90,18 @@ class TestConfigurationServiceIntegration:
         """Test that different containers have independent configuration instances."""
         env_vars1 = {"PROMPTBIN_PORT": "3000"}
         env_vars2 = {"PROMPTBIN_PORT": "4000"}
-        
+
         container1 = ServiceContainer()
         container2 = ServiceContainer()
-        
+
         with patch.dict(os.environ, env_vars1):
             container1.register_config()
             config1 = container1.resolve(PromptBinConfig)
-        
+
         with patch.dict(os.environ, env_vars2):
             container2.register_config()
             config2 = container2.resolve(PromptBinConfig)
-        
+
         assert config1.flask_port == 3000
         assert config2.flask_port == 4000
         assert config1 is not config2
@@ -113,7 +116,7 @@ class TestDependentServiceIntegration:
 
     def test_service_with_config_dependency(self):
         """Test a service that depends on configuration."""
-        
+
         class TestService:
             def __init__(self, config: PromptBinConfig):
                 self.config = config
@@ -124,17 +127,17 @@ class TestDependentServiceIntegration:
             self.container.register_config()
             self.container.register_singleton(
                 TestService,
-                lambda container: TestService(container.resolve(PromptBinConfig))
+                lambda container: TestService(container.resolve(PromptBinConfig)),
             )
-            
+
             service = self.container.resolve(TestService)
-            
+
             assert isinstance(service.config, PromptBinConfig)
             assert service.port == 9000
 
     def test_multiple_services_shared_config(self):
         """Test multiple services sharing the same configuration instance."""
-        
+
         class ServiceA:
             def __init__(self, config: PromptBinConfig):
                 self.config = config
@@ -145,44 +148,42 @@ class TestDependentServiceIntegration:
 
         with patch.dict(os.environ, {}, clear=True):
             self.container.register_config()
-            
+
             self.container.register_singleton(
-                ServiceA,
-                lambda container: ServiceA(container.resolve(PromptBinConfig))
+                ServiceA, lambda container: ServiceA(container.resolve(PromptBinConfig))
             )
-            
+
             self.container.register_singleton(
-                ServiceB,
-                lambda container: ServiceB(container.resolve(PromptBinConfig))
+                ServiceB, lambda container: ServiceB(container.resolve(PromptBinConfig))
             )
-            
+
             service_a = self.container.resolve(ServiceA)
             service_b = self.container.resolve(ServiceB)
-            
+
             # Both services should share the same config instance
             assert service_a.config is service_b.config
 
     def test_transient_service_shared_config(self):
         """Test transient services still share the same singleton config."""
-        
+
         class TransientService:
             def __init__(self, config: PromptBinConfig):
                 self.config = config
 
         with patch.dict(os.environ, {}, clear=True):
             self.container.register_config()
-            
+
             self.container.register_transient(
                 TransientService,
-                lambda container: TransientService(container.resolve(PromptBinConfig))
+                lambda container: TransientService(container.resolve(PromptBinConfig)),
             )
-            
+
             service1 = self.container.resolve(TransientService)
             service2 = self.container.resolve(TransientService)
-            
+
             # Services are different instances (transient)
             assert service1 is not service2
-            
+
             # But they share the same config instance (singleton)
             assert service1.config is service2.config
 
@@ -200,14 +201,14 @@ class TestConfigurationErrorHandling:
             mock_create.side_effect = ServiceRegistrationError(
                 PromptBinConfig, "Test error"
             )
-            
+
             self.container.register_config()
             with pytest.raises(ServiceRegistrationError, match="Test error"):
                 self.container.resolve(PromptBinConfig)
 
     def test_config_validation_failure_cascades_to_dependents(self):
         """Test that config validation failures prevent dependent service creation."""
-        
+
         class DependentService:
             def __init__(self, config: PromptBinConfig):
                 self.config = config
@@ -215,19 +216,21 @@ class TestConfigurationErrorHandling:
         # Register services with invalid configuration
         with patch.dict(os.environ, {"PROMPTBIN_PORT": "invalid"}):
             self.container.register_config()
-            
+
             self.container.register_singleton(
                 DependentService,
-                lambda container: DependentService(container.resolve(PromptBinConfig))
+                lambda container: DependentService(container.resolve(PromptBinConfig)),
             )
-            
+
             # Resolution should fail due to invalid config
-            with pytest.raises(ServiceRegistrationError, match="Failed to parse configuration"):
+            with pytest.raises(
+                ServiceRegistrationError, match="Failed to parse configuration"
+            ):
                 self.container.resolve(DependentService)
 
     def test_config_resolution_failure_in_dependent_service(self):
         """Test handling when config resolution fails in dependent service factory."""
-        
+
         class FailingService:
             def __init__(self, config: PromptBinConfig):
                 # Simulate failure during service creation
@@ -235,13 +238,15 @@ class TestConfigurationErrorHandling:
 
         with patch.dict(os.environ, {}, clear=True):
             self.container.register_config()
-            
+
             self.container.register_singleton(
                 FailingService,
-                lambda container: FailingService(container.resolve(PromptBinConfig))
+                lambda container: FailingService(container.resolve(PromptBinConfig)),
             )
-            
-            with pytest.raises(ServiceRegistrationError, match="Factory function failed"):
+
+            with pytest.raises(
+                ServiceRegistrationError, match="Factory function failed"
+            ):
                 self.container.resolve(FailingService)
 
 
@@ -254,7 +259,7 @@ class TestRealWorldIntegrationScenarios:
 
     def test_tunnel_manager_integration_pattern(self):
         """Test the pattern used by TunnelManager integration."""
-        
+
         # Mock TunnelManager-like service
         class MockTunnelManager:
             def __init__(self, flask_port: int, config: PromptBinConfig = None):
@@ -268,24 +273,20 @@ class TestRealWorldIntegrationScenarios:
                     self.enabled = True
                     self.rate_limit = 5
 
-        env_vars = {
-            "DEVTUNNEL_ENABLED": "false",
-            "DEVTUNNEL_RATE_LIMIT": "10"
-        }
+        env_vars = {"DEVTUNNEL_ENABLED": "false", "DEVTUNNEL_RATE_LIMIT": "10"}
 
         with patch.dict(os.environ, env_vars):
             self.container.register_config()
-            
+
             self.container.register_singleton(
                 MockTunnelManager,
                 lambda container: MockTunnelManager(
-                    flask_port=5001,
-                    config=container.resolve(PromptBinConfig)
-                )
+                    flask_port=5001, config=container.resolve(PromptBinConfig)
+                ),
             )
-            
+
             tunnel_manager = self.container.resolve(MockTunnelManager)
-            
+
             assert tunnel_manager.flask_port == 5001
             assert tunnel_manager.enabled is False
             assert tunnel_manager.rate_limit == 10
@@ -293,7 +294,7 @@ class TestRealWorldIntegrationScenarios:
 
     def test_flask_app_initialization_pattern(self):
         """Test the pattern used for Flask app initialization."""
-        
+
         # Mock Flask app initialization
         class MockFlaskApp:
             def __init__(self, config: PromptBinConfig):
@@ -308,19 +309,19 @@ class TestRealWorldIntegrationScenarios:
             "SECRET_KEY": "test-secret-key",
             "PROMPTBIN_HOST": "localhost",
             "PROMPTBIN_PORT": "3000",
-            "PROMPTBIN_DATA_DIR": "/tmp/test-data"
+            "PROMPTBIN_DATA_DIR": "/tmp/test-data",
         }
 
         with patch.dict(os.environ, env_vars):
             self.container.register_config()
-            
+
             self.container.register_singleton(
                 MockFlaskApp,
-                lambda container: MockFlaskApp(container.resolve(PromptBinConfig))
+                lambda container: MockFlaskApp(container.resolve(PromptBinConfig)),
             )
-            
+
             app = self.container.resolve(MockFlaskApp)
-            
+
             assert app.config_dict["SECRET_KEY"] == "test-secret-key"
             assert app.config_dict["HOST"] == "localhost"
             assert app.config_dict["PORT"] == 3000
@@ -328,7 +329,7 @@ class TestRealWorldIntegrationScenarios:
 
     def test_mcp_server_initialization_pattern(self):
         """Test the pattern used for MCP server initialization."""
-        
+
         # Mock MCP server
         class MockMCPServer:
             def __init__(self, config: PromptBinConfig):
@@ -342,19 +343,19 @@ class TestRealWorldIntegrationScenarios:
             "PROMPTBIN_HOST": "0.0.0.0",
             "PROMPTBIN_PORT": "8080",
             "PROMPTBIN_LOG_LEVEL": "DEBUG",
-            "PROMPTBIN_HEALTH_CHECK_INTERVAL": "60"
+            "PROMPTBIN_HEALTH_CHECK_INTERVAL": "60",
         }
 
         with patch.dict(os.environ, env_vars):
             self.container.register_config()
-            
+
             self.container.register_singleton(
                 MockMCPServer,
-                lambda container: MockMCPServer(container.resolve(PromptBinConfig))
+                lambda container: MockMCPServer(container.resolve(PromptBinConfig)),
             )
-            
+
             server = self.container.resolve(MockMCPServer)
-            
+
             assert server.host == "0.0.0.0"
             assert server.port == 8080
             assert server.log_level == "DEBUG"
