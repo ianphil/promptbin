@@ -1,8 +1,8 @@
 [project]
 name = "promptbin"
-version = "0.4.0"
+version = "0.4.1"
 description = "Easy-to-use MCP server for prompt management with web interface and secure sharing"
-readme = "docs/README.md"
+readme = "README.md"
 requires-python = ">=3.11"
 authors = [
     {name = "PromptBin Contributors", email = "noreply@promptbin.dev"}

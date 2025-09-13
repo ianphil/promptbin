@@ -64,71 +64,90 @@ Examples:
     )
     parser.add_argument(
         "--log-level",
-        default=os.environ.get("PROMPTBIN_LOG_LEVEL", "INFO"),
+        default="INFO",  # Remove direct environment variable access
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Logging level (default: INFO)",
     )
 
     # Version
-    parser.add_argument("--version", action="version", version="PromptBin 0.4.0")
+    parser.add_argument("--version", action="version", version="PromptBin 0.4.1")
 
     return parser
 
 
 def run_web_only(args):
     """Run only the web interface"""
-    from .app import main as app_main
+    from .app import init_app
+    from .core.config import PromptBinConfig
+    import logging
 
-    # Set up sys.argv for app.py's argument parser
-    sys.argv = [
-        "promptbin",
-        "--host",
-        args.host,
-        "--port",
-        str(args.port),
-        "--mode",
-        "standalone",
-        "--log-level",
-        args.log_level,
-        "--data-dir",
-        args.data_dir,
-    ]
+    # Create configuration with CLI overrides
+    config = PromptBinConfig.from_environment()
+    config.flask_host = args.host
+    config.flask_port = args.port
+    config.data_dir = args.data_dir
+    config.log_level = args.log_level.upper()
+    config.validate()
 
-    print(f"🌐 Starting PromptBin web interface at http://{args.host}:{args.port}")
-    app_main()
+    # Configure logging
+    logging.basicConfig(level=getattr(logging, config.log_level.upper(), logging.INFO))
+
+    print(
+        f"🌐 Starting PromptBin web interface at "
+        f"http://{config.flask_host}:{config.flask_port}"
+    )
+
+    # Initialize and run Flask app
+    app = init_app(config)
+    app.config["MODE"] = "standalone"
+    app.run(host=config.flask_host, port=config.flask_port, debug=True)
 
 
 def run_mcp_only(args):
     """Run only the MCP server"""
-    from .mcp.server import main as mcp_main
+    from .mcp.server import PromptBinMCPServer
+    from .core.config import PromptBinConfig
 
-    # Set environment variables for MCP server
-    os.environ["PROMPTBIN_HOST"] = args.host
-    os.environ["PROMPTBIN_PORT"] = str(args.port)
-    os.environ["PROMPTBIN_DATA_DIR"] = args.data_dir
-    os.environ["PROMPTBIN_LOG_LEVEL"] = args.log_level
+    # Create configuration with CLI overrides
+    config = PromptBinConfig.from_environment()
+    config.flask_host = args.host
+    config.flask_port = args.port
+    config.data_dir = args.data_dir
+    config.log_level = args.log_level.upper()
+    config.validate()
 
     print("🤖 Starting PromptBin MCP server...")
-    return mcp_main()
+
+    # Create and run MCP server with configuration
+    server = PromptBinMCPServer(config=config)
+    return server.mcp.run()
 
 
 def run_both(args):
     """Run both MCP server and web interface
     (MCP server will launch Flask subprocess)"""
-    from .mcp.server import main as mcp_main
+    from .mcp.server import PromptBinMCPServer
+    from .core.config import PromptBinConfig
 
-    # Set environment variables for MCP server (which will launch Flask subprocess)
-    os.environ["PROMPTBIN_HOST"] = args.host
-    os.environ["PROMPTBIN_PORT"] = str(args.port)
-    os.environ["PROMPTBIN_DATA_DIR"] = args.data_dir
-    os.environ["PROMPTBIN_LOG_LEVEL"] = args.log_level
+    # Create configuration with CLI overrides
+    config = PromptBinConfig.from_environment()
+    config.flask_host = args.host
+    config.flask_port = args.port
+    config.data_dir = args.data_dir
+    config.log_level = args.log_level.upper()
+    config.validate()
 
     print("🚀 Starting PromptBin (MCP server + web interface)...")
     print("🤖 MCP server: Ready for AI tool connections")
-    print(f"🌐 Web interface: Will be available at http://{args.host}:{args.port}")
+    print(
+        f"🌐 Web interface: Will be available at "
+        f"http://{config.flask_host}:{config.flask_port}"
+    )
     print("💡 Note: Web interface runs as a subprocess when in MCP mode")
 
-    return mcp_main()
+    # Create and run MCP server with configuration
+    server = PromptBinMCPServer(config=config)
+    return server.mcp.run()
 
 
 def main():
