@@ -22,6 +22,7 @@ from typing import Optional
 @dataclass
 class TestBlock:
     """Represents a single test code block"""
+
     section: str
     code: str
     line_number: int
@@ -31,6 +32,7 @@ class TestBlock:
 @dataclass
 class TestResult:
     """Result of executing a test block"""
+
     block: TestBlock
     passed: bool
     error: Optional[str] = None
@@ -56,7 +58,7 @@ class LiterateTestRunner:
 
     def parse(self) -> list[TestBlock]:
         """Extract test blocks from markdown"""
-        lines = self.content.split('\n')
+        lines = self.content.split("\n")
         current_section = "Unknown"
         in_code_block = False
         code_lines = []
@@ -65,12 +67,12 @@ class LiterateTestRunner:
 
         for i, line in enumerate(lines, 1):
             # Track section headers
-            if line.startswith('## '):
+            if line.startswith("## "):
                 current_section = line[3:].strip()
                 continue
 
             # Detect code block start
-            if line.startswith('```python'):
+            if line.startswith("```python"):
                 in_code_block = True
                 block_language = "python"
                 block_start_line = i
@@ -78,18 +80,20 @@ class LiterateTestRunner:
                 continue
 
             # Detect code block end
-            if line.startswith('```') and in_code_block:
+            if line.startswith("```") and in_code_block:
                 in_code_block = False
                 if block_language == "python" and code_lines:
-                    code = '\n'.join(code_lines)
+                    code = "\n".join(code_lines)
                     # Extract expect comments
                     assertions = self._extract_assertions(code)
-                    self.blocks.append(TestBlock(
-                        section=current_section,
-                        code=code,
-                        line_number=block_start_line,
-                        assertions=assertions
-                    ))
+                    self.blocks.append(
+                        TestBlock(
+                            section=current_section,
+                            code=code,
+                            line_number=block_start_line,
+                            assertions=assertions,
+                        )
+                    )
                 continue
 
             # Collect code lines
@@ -101,9 +105,9 @@ class LiterateTestRunner:
     def _extract_assertions(self, code: str) -> list[tuple[int, str]]:
         """Extract # expect: comments and their expected values"""
         assertions = []
-        lines = code.split('\n')
+        lines = code.split("\n")
         for i, line in enumerate(lines):
-            match = re.search(r'#\s*expect:\s*(.+)$', line)
+            match = re.search(r"#\s*expect:\s*(.+)$", line)
             if match:
                 expected = match.group(1).strip()
                 assertions.append((i + 1, expected))
@@ -123,7 +127,7 @@ class LiterateTestRunner:
     def _run_block(self, block: TestBlock) -> TestResult:
         """Execute a single test block"""
         # Create isolated namespace for execution
-        namespace = {'__name__': '__test__'}
+        namespace = {"__name__": "__test__"}
 
         try:
             # Execute the code block
@@ -133,7 +137,7 @@ class LiterateTestRunner:
             return TestResult(
                 block=block,
                 passed=True,
-                assertion_results=[(a[0], a[1], True) for a in block.assertions]
+                assertion_results=[(a[0], a[1], True) for a in block.assertions],
             )
 
         except AssertionError as e:
@@ -141,15 +145,13 @@ class LiterateTestRunner:
                 block=block,
                 passed=False,
                 error=f"AssertionError: {e}",
-                assertion_results=[(0, str(e), False)]
+                assertion_results=[(0, str(e), False)],
             )
 
         except Exception as e:
             tb = traceback.format_exc()
             return TestResult(
-                block=block,
-                passed=False,
-                error=f"{type(e).__name__}: {e}\n{tb}"
+                block=block, passed=False, error=f"{type(e).__name__}: {e}\n{tb}"
             )
 
     def report(self) -> int:
@@ -182,7 +184,7 @@ class LiterateTestRunner:
 
             # Print error details for failures
             if not result.passed and result.error:
-                error_lines = result.error.split('\n')
+                error_lines = result.error.split("\n")
                 for line in error_lines[:5]:  # Limit error output
                     print(f"    {self.RED}{line}{self.RESET}")
                 if len(error_lines) > 5:
@@ -210,7 +212,9 @@ def main():
     """CLI entry point"""
     if len(sys.argv) < 2:
         print("Usage: python run_literate_tests.py <test_file.md>")
-        print("Example: python tests/run_literate_tests.py tests/mcp_server_lifecycle.md")
+        print(
+            "Example: python tests/run_literate_tests.py tests/mcp_server_lifecycle.md"
+        )
         sys.exit(1)
 
     filepath = Path(sys.argv[1])
@@ -218,7 +222,7 @@ def main():
         print(f"Error: File not found: {filepath}")
         sys.exit(1)
 
-    if not filepath.suffix == '.md':
+    if not filepath.suffix == ".md":
         print(f"Warning: Expected .md file, got: {filepath.suffix}")
 
     runner = LiterateTestRunner(filepath)
